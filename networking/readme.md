@@ -1,0 +1,1 @@
+ThIs is socket wrapper over std::net::TcpStream, it doesn't use any security, do not use it outside tests
