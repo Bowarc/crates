@@ -5,4 +5,5 @@ members = [
     "random",
     "mem",
     "time",
+    "networking"
 ]
