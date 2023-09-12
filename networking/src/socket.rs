@@ -38,9 +38,7 @@ impl Header {
     }
 }
 
-impl<R: serde::de::DeserializeOwned + std::fmt::Debug, W: serde::Serialize + std::fmt::Debug>
-    Socket<R, W>
-{
+impl<R: crate::Message, W: crate::Message> Socket<R, W> {
     pub fn new(stream: std::net::TcpStream) -> Self {
         Self {
             stream,
