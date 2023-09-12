@@ -10,6 +10,14 @@ pub struct NetworkStats<SRCW: crate::Message, SWCR: crate::Message> {
 }
 
 impl<SRCW: crate::Message, SWCR: crate::Message> NetworkStats<SRCW, SWCR> {
+    pub fn new() -> Self {
+        Self {
+            rtt: rtt::Rtt::default(),
+            bps: bps::Bps::default(),
+            srcw: std::marker::PhantomData,
+            swcr: std::marker::PhantomData,
+        }
+    }
     pub fn update(
         &mut self,
         _channel: &mut threading::Channel<SWCR, SRCW>,
@@ -86,12 +94,7 @@ impl<SRCW: crate::Message, SWCR: crate::Message> NetworkStats<SRCW, SWCR> {
 
 impl<SRCW: crate::Message, SWCR: crate::Message> Default for NetworkStats<SRCW, SWCR> {
     fn default() -> Self {
-        Self {
-            rtt: rtt::Rtt::default(),
-            bps: bps::Bps::default(),
-            srcw: std::marker::PhantomData,
-            swcr: std::marker::PhantomData,
-        }
+        Self::new()
     }
 }
 
@@ -149,7 +152,7 @@ fn testing() {
     impl<R: crate::Message, W: crate::Message> Testing<R, W> {
         fn new() -> Self {
             Self {
-                s: NetworkStats::<R, W>::default(),
+                s: NetworkStats::<R, W>::new(),
             }
         }
     }
