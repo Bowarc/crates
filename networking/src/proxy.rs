@@ -38,18 +38,22 @@ impl<SRCW: crate::Message, SWCR: crate::Message> Proxy<SRCW, SWCR> {
             loop_helper.loop_start();
 
             let mut stats = self.stats.read().clone();
-            stats.update(&mut self.channel, &mut self.socket);
+            if let Err(e) = stats.update(&mut self.channel, &mut self.socket) {
+                warn!(
+                    "Stats update encountered an error: {e}, stopping proxy for {}",
+                    self.socket.remote_addr()
+                );
+                break;
+            }
 
             if let Err(e) = self.handle_channel(&mut stats) {
                 warn!("Proxy encountered an error while handling channel {e:?}");
-                self.running
-                    .store(false, std::sync::atomic::Ordering::Relaxed);
+                break;
             }
 
             if let Err(e) = self.handle_socket(&mut stats) {
                 warn!("Proxy encountered an error while handling socket {e:?}");
-                self.running
-                    .store(false, std::sync::atomic::Ordering::Relaxed);
+                break;
             }
 
             self.stats.write(stats);

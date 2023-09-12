@@ -22,19 +22,25 @@ impl<SRCW: crate::Message, SWCR: crate::Message> NetworkStats<SRCW, SWCR> {
         &mut self,
         _channel: &mut threading::Channel<SWCR, SRCW>,
         socket: &mut crate::Socket<SRCW, SWCR>,
-    ) {
-        self.update_rtt(socket);
+    ) -> Result<(), crate::socket::SocketError> {
+        self.update_rtt(socket)?;
         self.bps.update();
+        Ok(())
     }
 
     // This can't be in rtt.update as you need the function on_msg_send and on_bytes_send
-    fn update_rtt(&mut self, socket: &mut crate::Socket<SRCW, SWCR>) {
+    fn update_rtt(
+        &mut self,
+        socket: &mut crate::Socket<SRCW, SWCR>,
+    ) -> Result<(), crate::socket::SocketError> {
         if self.rtt.needs_ping() {
             let msg = SWCR::default_ping();
             self.on_msg_send(&msg);
-            let header = socket.send(msg).unwrap();
+            let header = socket.send(msg)?;
             self.on_bytes_send(&header);
         }
+
+        Ok(())
     }
 
     pub fn on_msg_recv(&mut self, msg: &SRCW) {
