@@ -2,5 +2,6 @@
 members = [
     "logger",
     "threading",
-    "random"
+    "random",
+    "mem"
 ]
