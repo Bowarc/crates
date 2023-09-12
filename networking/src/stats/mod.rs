@@ -1,7 +1,7 @@
 mod bps;
 mod rtt;
 
-#[derive(Default, Clone)]
+#[derive(Clone)]
 pub struct NetworkStats<SRCW: crate::Message, SWCR: crate::Message> {
     rtt: rtt::Rtt,
     bps: bps::Bps,
@@ -82,4 +82,76 @@ impl<SRCW: crate::Message, SWCR: crate::Message> NetworkStats<SRCW, SWCR> {
     pub fn bps_sent_last_10_sec(&self) -> usize {
         self.bps.bps_sent_last_10_sec()
     }
+}
+
+impl<SRCW: crate::Message, SWCR: crate::Message> Default for NetworkStats<SRCW, SWCR> {
+    fn default() -> Self {
+        Self {
+            rtt: rtt::Rtt::default(),
+            bps: bps::Bps::default(),
+            srcw: std::marker::PhantomData,
+            swcr: std::marker::PhantomData,
+        }
+    }
+}
+
+#[test]
+fn testing() {
+    #[derive(serde::Serialize, serde::Deserialize, Debug, PartialEq, Clone)]
+    pub enum ClientMessage {
+        Text(String),
+        Ping,
+        Pong,
+    }
+    #[derive(serde::Serialize, serde::Deserialize, Debug, PartialEq, Clone)]
+    pub enum ServerMessage {
+        Text(String),
+        Ping,
+        Pong,
+    }
+
+    impl crate::Message for ClientMessage {
+        fn is_ping(&self) -> bool {
+            matches!(self, Self::Ping)
+        }
+        fn is_pong(&self) -> bool {
+            matches!(self, Self::Pong)
+        }
+
+        fn default_ping() -> Self {
+            Self::Ping
+        }
+        fn default_pong() -> Self {
+            Self::Pong
+        }
+    }
+
+    impl crate::Message for ServerMessage {
+        fn is_ping(&self) -> bool {
+            matches!(self, Self::Ping)
+        }
+        fn is_pong(&self) -> bool {
+            matches!(self, Self::Pong)
+        }
+
+        fn default_ping() -> Self {
+            Self::Ping
+        }
+        fn default_pong() -> Self {
+            Self::Pong
+        }
+    }
+
+    pub struct Testing<R: crate::Message, W: crate::Message> {
+        s: NetworkStats<R, W>,
+    }
+
+    impl<R: crate::Message, W: crate::Message> Testing<R, W> {
+        fn new() -> Self {
+            Self {
+                s: NetworkStats::<R, W>::default(),
+            }
+        }
+    }
+    let t = Testing::<ServerMessage, ClientMessage>::new();
 }
