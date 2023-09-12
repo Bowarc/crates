@@ -1,4 +1,4 @@
-#[derive(Default, Clone)]
+#[derive(Clone)]
 pub struct Bps {
     total_sent: usize,
     total_received: usize,
@@ -61,5 +61,17 @@ impl Bps {
     pub fn on_bytes_send(&mut self, header: &crate::socket::Header) {
         self.total_sent += header.size;
         self.rolling_window.last_mut().unwrap().bytes_sent += header.size;
+    }
+}
+
+impl Default for Bps {
+    fn default() -> Self {
+        let mut bps = Self {
+            total_sent: 0,
+            total_received: 0,
+            rolling_window: Vec::new(),
+        };
+        bps.update();
+        bps
     }
 }
