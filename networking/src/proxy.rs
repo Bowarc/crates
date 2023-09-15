@@ -99,7 +99,7 @@ impl<SRCW: crate::Message, SWCR: crate::Message> Proxy<SRCW, SWCR> {
         // here you receive message sent by the client
         match self.socket.try_recv() {
             Ok((header, msg)) => {
-                stats.on_msg_recv(&msg);
+                stats.on_msg_recv(&msg, &mut self.socket);
                 stats.on_bytes_recv(&header);
 
                 self.channel

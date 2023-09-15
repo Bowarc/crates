@@ -50,12 +50,20 @@ impl<SRCW: crate::Message, SWCR: crate::Message> NetworkStats<SRCW, SWCR> {
         Ok(())
     }
 
-    pub fn on_msg_recv(&mut self, msg: &SRCW) {
+    pub fn on_msg_recv(&mut self, msg: &SRCW, socket: &mut crate::Socket<SRCW, SWCR>) {
         if msg.is_pong() {
             if let Some(stopwatch) = &self.rtt.ping_request_stopwatch {
                 self.rtt.set(stopwatch.read());
                 self.rtt.ping_request_stopwatch = None;
                 self.rtt.last_pong = std::time::Instant::now();
+            }
+        } else if msg.is_ping() {
+            let resp = SWCR::default_pong();
+            self.on_msg_send(&resp);
+            if let Ok(header) = socket.send(resp) {
+                self.on_bytes_send(&header);
+            } else {
+                warn!("Could not send pong to {}", socket.remote_addr());
             }
         }
     }
