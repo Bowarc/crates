@@ -1,21 +1,28 @@
 mod bps;
+mod config;
 mod rtt;
 
 #[derive(Clone)]
 pub struct NetworkStats<SRCW: crate::Message, SWCR: crate::Message> {
-    rtt: rtt::Rtt,
     bps: bps::Bps,
+    rtt: rtt::Rtt,
     srcw: std::marker::PhantomData<SRCW>,
     swcr: std::marker::PhantomData<SWCR>,
+    cfg: config::StatConfig,
 }
 
 impl<SRCW: crate::Message, SWCR: crate::Message> NetworkStats<SRCW, SWCR> {
-    pub fn new() -> Self {
+    pub fn new(
+        bps_cfg_opt: Option<config::BpsConfig>,
+        rtt_cfg_opt: Option<config::RttConfig>,
+        stat_cfg_opt: Option<config::StatConfig>,
+    ) -> Self {
         Self {
-            rtt: rtt::Rtt::default(),
-            bps: bps::Bps::default(),
+            bps: bps::Bps::new(bps_cfg_opt.unwrap_or_default()),
+            rtt: rtt::Rtt::new(rtt_cfg_opt.unwrap_or_default()),
             srcw: std::marker::PhantomData,
             swcr: std::marker::PhantomData,
+            cfg: stat_cfg_opt.unwrap_or_default(),
         }
     }
     pub fn update(
@@ -100,7 +107,13 @@ impl<SRCW: crate::Message, SWCR: crate::Message> NetworkStats<SRCW, SWCR> {
 
 impl<SRCW: crate::Message, SWCR: crate::Message> Default for NetworkStats<SRCW, SWCR> {
     fn default() -> Self {
-        Self::new()
+        Self {
+            bps: bps::Bps::new(config::BpsConfig::default()),
+            rtt: rtt::Rtt::new(config::RttConfig::default()),
+            srcw: std::marker::PhantomData,
+            swcr: std::marker::PhantomData,
+            cfg: config::StatConfig::default(),
+        }
     }
 }
 
@@ -158,7 +171,7 @@ fn testing() {
     impl<R: crate::Message, W: crate::Message> Testing<R, W> {
         fn new() -> Self {
             Self {
-                s: NetworkStats::<R, W>::new(),
+                s: NetworkStats::<R, W>::new(None, None, None),
             }
         }
     }
