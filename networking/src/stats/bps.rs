@@ -26,7 +26,7 @@ impl Bps {
             bytes_received: 0,
         });
 
-        println!("{} windows", self.rolling_window.len());
+        // println!("{} windows", self.rolling_window.len());
     }
 
     pub fn total_received(&self) -> usize {
