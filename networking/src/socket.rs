@@ -1,7 +1,10 @@
 pub const HEADER_SIZE: usize = std::mem::size_of::<Header>();
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Copy)]
-// ofc don't use type that can change size (such as Vec) so the size of the struct stays the same as the constant
+// You can modify this struct to store whatever data you want, just be sure that your data's size can't change as it
+// would fuck up the precise reading
+// (Ex: if the header struct contains a Vec or a String (dyamic sized object), depending on the number of elements
+// the field changes size (therefore the Header struct too), which makes the HEADER_SIZE constant unrepresntative of the real Header size)
 pub struct Header {
     pub size: usize,
 }
@@ -77,7 +80,7 @@ impl<R: crate::Message, W: crate::Message> Socket<R, W> {
     pub fn try_recv(&mut self) -> Result<(Header, R), SocketError> {
         let header = match self.last_header {
             Some(header) => {
-                debug!("Using saved header: {header:?}");
+                trace!("Using saved header: {header:?}");
                 header
             }
             None => {
