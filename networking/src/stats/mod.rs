@@ -1,6 +1,8 @@
 mod bps;
-mod config;
+pub mod config;
 mod rtt;
+
+pub use config::StatConfig;
 
 #[derive(Clone)]
 pub struct NetworkStats<SRCW: crate::Message, SWCR: crate::Message> {
@@ -12,22 +14,18 @@ pub struct NetworkStats<SRCW: crate::Message, SWCR: crate::Message> {
 }
 
 impl<SRCW: crate::Message, SWCR: crate::Message> NetworkStats<SRCW, SWCR> {
-    pub fn new(
-        bps_cfg_opt: Option<config::BpsConfig>,
-        rtt_cfg_opt: Option<config::RttConfig>,
-        stat_cfg_opt: Option<config::StatConfig>,
-    ) -> Self {
+    pub fn new(cfg: config::StatConfig) -> Self {
         Self {
-            bps: bps::Bps::new(bps_cfg_opt.unwrap_or_default()),
-            rtt: rtt::Rtt::new(rtt_cfg_opt.unwrap_or_default()),
+            bps: bps::Bps::new(cfg.bps),
+            rtt: rtt::Rtt::new(cfg.rtt),
             srcw: std::marker::PhantomData,
             swcr: std::marker::PhantomData,
-            cfg: stat_cfg_opt.unwrap_or_default(),
+            cfg,
         }
     }
     pub fn update(
         &mut self,
-        _channel: &mut threading::Channel<SWCR, SRCW>,
+        _channel: &mut threading::Channel<SWCR, super::proxy::ProxyMessage<SRCW>>,
         socket: &mut crate::Socket<SRCW, SWCR>,
     ) -> Result<(), crate::socket::SocketError> {
         self.update_rtt(socket)?;
@@ -179,9 +177,9 @@ fn testing() {
     impl<R: crate::Message, W: crate::Message> Testing<R, W> {
         fn new() -> Self {
             Self {
-                s: NetworkStats::<R, W>::new(None, None, None),
+                s: NetworkStats::<R, W>::new(StatConfig::default()),
             }
         }
     }
-    let t = Testing::<ServerMessage, ClientMessage>::new();
+    let _t = Testing::<ServerMessage, ClientMessage>::new();
 }

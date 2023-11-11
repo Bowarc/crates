@@ -7,7 +7,10 @@ pub struct RttConfig {
 }
 
 #[derive(Default, Copy, Clone, Debug)]
-pub struct StatConfig {}
+pub struct StatConfig {
+    pub bps: BpsConfig,
+    pub rtt: RttConfig,
+}
 
 impl Default for RttConfig {
     fn default() -> Self {
