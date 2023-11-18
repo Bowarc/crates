@@ -6,8 +6,8 @@ pub use config::StatConfig;
 
 #[derive(Clone)]
 pub struct NetworkStats<SRCW: crate::Message, SWCR: crate::Message> {
-    bps: bps::Bps,
-    rtt: rtt::Rtt,
+    bps_opt: Option<bps::Bps>,
+    rtt_opt: Option<rtt::Rtt>,
     srcw: std::marker::PhantomData<SRCW>,
     swcr: std::marker::PhantomData<SWCR>,
     cfg: config::StatConfig,
@@ -16,8 +16,16 @@ pub struct NetworkStats<SRCW: crate::Message, SWCR: crate::Message> {
 impl<SRCW: crate::Message, SWCR: crate::Message> NetworkStats<SRCW, SWCR> {
     pub fn new(cfg: config::StatConfig) -> Self {
         Self {
-            bps: bps::Bps::new(cfg.bps),
-            rtt: rtt::Rtt::new(cfg.rtt),
+            bps_opt: if cfg.bps.enabled {
+                Some(bps::Bps::new(cfg.bps))
+            } else {
+                None
+            },
+            rtt_opt: if cfg.bps.enabled {
+                Some(rtt::Rtt::new(cfg.rtt))
+            } else {
+                None
+            },
             srcw: std::marker::PhantomData,
             swcr: std::marker::PhantomData,
             cfg,
@@ -28,8 +36,13 @@ impl<SRCW: crate::Message, SWCR: crate::Message> NetworkStats<SRCW, SWCR> {
         _channel: &mut threading::Channel<SWCR, super::proxy::ProxyMessage<SRCW>>,
         socket: &mut crate::Socket<SRCW, SWCR>,
     ) -> Result<(), crate::socket::SocketError> {
-        self.update_rtt(socket)?;
-        self.bps.update();
+        if self.cfg.rtt.enabled {
+            self.update_rtt(socket)?;
+        }
+
+        if let Some(bps) = &mut self.bps_opt {
+            bps.update();
+        }
         Ok(())
     }
 
@@ -38,7 +51,11 @@ impl<SRCW: crate::Message, SWCR: crate::Message> NetworkStats<SRCW, SWCR> {
         &mut self,
         socket: &mut crate::Socket<SRCW, SWCR>,
     ) -> Result<(), crate::socket::SocketError> {
-        if self.rtt.needs_ping() {
+        let Some(rtt) = &mut self.rtt_opt else{
+            return Ok(())
+        };
+
+        if rtt.needs_ping() {
             let msg = SWCR::default_ping();
             self.on_msg_send(&msg);
             let header = socket.send(msg)?;
@@ -49,13 +66,7 @@ impl<SRCW: crate::Message, SWCR: crate::Message> NetworkStats<SRCW, SWCR> {
     }
 
     pub fn on_msg_recv(&mut self, msg: &SRCW, socket: &mut crate::Socket<SRCW, SWCR>) {
-        if msg.is_pong() {
-            if let Some(stopwatch) = &self.rtt.ping_request_stopwatch {
-                self.rtt.set(stopwatch.read());
-                self.rtt.ping_request_stopwatch = None;
-                self.rtt.last_pong = std::time::Instant::now();
-            }
-        } else if msg.is_ping() {
+        if msg.is_ping() {
             let resp = SWCR::default_pong();
             self.on_msg_send(&resp);
             if let Ok(header) = socket.send(resp) {
@@ -63,59 +74,99 @@ impl<SRCW: crate::Message, SWCR: crate::Message> NetworkStats<SRCW, SWCR> {
             } else {
                 warn!("Could not send pong to {}", socket.remote_addr());
             }
+        } else if msg.is_pong() {
+            if let Some(rtt) = &mut self.rtt_opt {
+                if let Some(stopwatch) = &rtt.ping_request_stopwatch {
+                    rtt.set(stopwatch.read());
+                    rtt.ping_request_stopwatch = None;
+                    rtt.last_pong = std::time::Instant::now();
+                }
+            }
         }
     }
     pub fn on_bytes_recv(&mut self, header: &crate::socket::Header) {
-        self.bps.on_bytes_recv(header)
+        // we don't use if let else here because it's a general purpose function
+        if let Some(bps) = &mut self.bps_opt {
+            bps.on_bytes_recv(header)
+        }
     }
 
     pub fn on_msg_send(&mut self, msg: &SWCR) {
-        if msg.is_ping() && self.rtt.ping_request_stopwatch.is_none() {
-            self.rtt.ping_request_stopwatch = Some(time::Stopwatch::start_new())
+        // we don't use if let else here because it's a general purpose function
+        if let Some(rtt) = &mut self.rtt_opt {
+            if msg.is_ping() && rtt.ping_request_stopwatch.is_none() {
+                rtt.ping_request_stopwatch = Some(time::Stopwatch::start_new())
+            }
         }
     }
     pub fn on_bytes_send(&mut self, header: &crate::socket::Header) {
-        self.bps.on_bytes_send(header)
+        // we don't use if let else here because it's a general purpose function
+        if let Some(bps) = &mut self.bps_opt {
+            bps.on_bytes_send(header)
+        }
     }
 }
 
 // rtt
 impl<SRCW: crate::Message, SWCR: crate::Message> NetworkStats<SRCW, SWCR> {
-    pub fn set_rtt(&mut self, rtt: std::time::Duration) {
-        self.rtt.set(rtt)
+    pub fn set_rtt(&mut self, duration: std::time::Duration) {
+        if let Some(rtt) = &mut self.rtt_opt {
+            rtt.set(duration)
+        }
     }
     pub fn get_rtt(&self) -> std::time::Duration {
-        self.rtt.get()
+        self.rtt_opt
+            .as_ref()
+            .map(|rtt| rtt.get())
+            .unwrap_or(std::time::Duration::ZERO)
     }
 }
 
 //bps
 impl<SRCW: crate::Message, SWCR: crate::Message> NetworkStats<SRCW, SWCR> {
     pub fn total_received(&self) -> usize {
-        self.bps.total_received()
+        self.bps_opt
+            .as_ref()
+            .map(|bps| bps.total_received())
+            .unwrap_or(0)
     }
     pub fn total_sent(&self) -> usize {
-        self.bps.total_sent()
+        self.bps_opt
+            .as_ref()
+            .map(|bps| bps.total_sent())
+            .unwrap_or(0)
     }
     pub fn received_last_10_sec(&self) -> usize {
-        self.bps.received_last_10_sec()
+        self.bps_opt
+            .as_ref()
+            .map(|bps| bps.received_last_10_sec())
+            .unwrap_or(0)
     }
     pub fn bps_received_last_10_sec(&self) -> usize {
-        self.bps.bps_received_last_10_sec()
+        self.bps_opt
+            .as_ref()
+            .map(|bps| bps.bps_received_last_10_sec())
+            .unwrap_or(0)
     }
     pub fn sent_last_10_sec(&self) -> usize {
-        self.bps.sent_last_10_sec()
+        self.bps_opt
+            .as_ref()
+            .map(|bps| bps.sent_last_10_sec())
+            .unwrap_or(0)
     }
     pub fn bps_sent_last_10_sec(&self) -> usize {
-        self.bps.bps_sent_last_10_sec()
+        self.bps_opt
+            .as_ref()
+            .map(|bps| bps.bps_sent_last_10_sec())
+            .unwrap_or(0)
     }
 }
 
 impl<SRCW: crate::Message, SWCR: crate::Message> Default for NetworkStats<SRCW, SWCR> {
     fn default() -> Self {
         Self {
-            bps: bps::Bps::new(config::BpsConfig::default()),
-            rtt: rtt::Rtt::new(config::RttConfig::default()),
+            bps_opt: None,
+            rtt_opt: None,
             srcw: std::marker::PhantomData,
             swcr: std::marker::PhantomData,
             cfg: config::StatConfig::default(),

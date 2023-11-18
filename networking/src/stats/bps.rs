@@ -6,6 +6,9 @@ pub struct Bps {
     rolling_window: Vec<WindowEntry>,
     cfg: super::config::BpsConfig,
 }
+/*
+    Do i warn when when the user is using bps while it's disabled ?
+*/
 
 #[derive(Clone)]
 pub struct WindowEntry {
@@ -24,6 +27,9 @@ impl Bps {
         };
         bps.update();
         bps
+    }
+    fn enabled(&self) -> bool {
+        self.cfg.enabled
     }
 
     pub fn update(&mut self) {
@@ -65,13 +71,13 @@ impl Bps {
     pub fn bps_sent_last_10_sec(&self) -> usize {
         self.sent_last_10_sec() / 10
     }
-
     pub fn on_bytes_recv(&mut self, header: &crate::socket::Header) {
         self.total_received += header.size;
         self.rolling_window.last_mut().unwrap().bytes_received += header.size;
     }
     pub fn on_bytes_send(&mut self, header: &crate::socket::Header) {
-        self.total_sent += header.size;
-        self.rolling_window.last_mut().unwrap().bytes_sent += header.size;
+        let byte_sent = header.size + crate::socket::HEADER_SIZE;
+        self.total_sent += byte_sent;
+        self.rolling_window.last_mut().unwrap().bytes_sent += byte_sent;
     }
 }

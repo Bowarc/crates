@@ -17,6 +17,9 @@ impl Rtt {
     }
 
     pub fn needs_ping(&self) -> bool {
+        if !self.cfg.enabled {
+            return false;
+        }
         self.last_pong.elapsed() > self.cfg.ping_request_delay
             && self.ping_request_stopwatch.is_none()
     }
