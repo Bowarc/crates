@@ -70,6 +70,10 @@ impl<SRCW: crate::Message + 'static, SWCR: crate::Message + 'static> Proxy<SRCW,
 
     fn try_connect(&mut self) {
         if let Ok(stream) = std::net::TcpStream::connect(self.addr) {
+            if let Err(e) = stream.set_nonblocking(true){
+                error!("Could not set the created stream to non-blocking: {e}");
+                return;
+            }
             self.socket_opt = Some(crate::Socket::new(stream));
             self.set_running(true)
         } else {
