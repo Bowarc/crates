@@ -15,6 +15,8 @@ pub struct ProxyConfig {
     pub addr: std::net::SocketAddr,
     pub run_tps: usize,
     pub stat_cfg: crate::stats::StatConfig,
+    // https://github.com/Bowarc/Crates/issues/8
+    pub keep_msg_while_disconnected: bool,
 }
 
 pub struct ProxyOutput<SRCW: crate::Message, SWCR: crate::Message> {
@@ -40,7 +42,7 @@ pub enum ProxyError {
 }
 
 impl<SRCW: crate::Message + 'static, SWCR: crate::Message + 'static> Proxy<SRCW, SWCR> {
-    pub fn start_new(cfg: ProxyConfig) -> ProxyOutput<SRCW, SWCR> {
+    pub fn start_new(cfg: ProxyConfig, stream: std::net::TcpStream) -> ProxyOutput<SRCW, SWCR> {
         let (proxy_channel, main_channel) =
             threading::Channel::<ProxyMessage<SRCW>, SWCR>::new_pair();
 
@@ -52,7 +54,7 @@ impl<SRCW: crate::Message + 'static, SWCR: crate::Message + 'static> Proxy<SRCW,
         let proxy = Proxy::<SRCW, SWCR> {
             addr: cfg.addr,
             cfg,
-            socket_opt: None,
+            socket_opt: Some(crate::Socket::new(stream)),
             channel: proxy_channel,
             running: running.clone(),
             stats: stats_in,
@@ -75,7 +77,12 @@ impl<SRCW: crate::Message + 'static, SWCR: crate::Message + 'static> Proxy<SRCW,
                 return;
             }
             self.socket_opt = Some(crate::Socket::new(stream));
-            self.set_running(true)
+            self.set_running(true);
+            if !self.cfg.keep_msg_while_disconnected{
+                while let Ok(value) = self.channel.try_recv() {
+                    drop(value)
+                }
+            }
         } else {
             self.set_running(false)
         }
