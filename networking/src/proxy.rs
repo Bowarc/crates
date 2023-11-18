@@ -42,7 +42,7 @@ pub enum ProxyError {
 }
 
 impl<SRCW: crate::Message + 'static, SWCR: crate::Message + 'static> Proxy<SRCW, SWCR> {
-    pub fn start_new(cfg: ProxyConfig, stream: std::net::TcpStream) -> ProxyOutput<SRCW, SWCR> {
+    pub fn start_new(cfg: ProxyConfig, stream_opt: Option<std::net::TcpStream>) -> ProxyOutput<SRCW, SWCR> {
         let (proxy_channel, main_channel) =
             threading::Channel::<ProxyMessage<SRCW>, SWCR>::new_pair();
 
@@ -51,16 +51,19 @@ impl<SRCW: crate::Message + 'static, SWCR: crate::Message + 'static> Proxy<SRCW,
         let (stats_in, stats_out) =
             triple_buffer::TripleBuffer::new(&crate::NetworkStats::new(cfg.stat_cfg)).split();
 
+        let socket_opt = stream_opt.map(crate::Socket::new);
+
         let proxy = Proxy::<SRCW, SWCR> {
             addr: cfg.addr,
             cfg,
-            socket_opt: Some(crate::Socket::new(stream)),
+            socket_opt,
             channel: proxy_channel,
             running: running.clone(),
             stats: stats_in,
         };
 
         let thread_handle = std::thread::spawn(move || proxy.run());
+
 
         ProxyOutput {
             stats: stats_out,
