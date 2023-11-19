@@ -113,6 +113,7 @@ match proxy_output.channel.recv().unwrap() {
     }
     networking::proxy::ProxyMessage::ConnectionResetError => {
         // The proxy's connection has stopped, if auto_reconnect is set, the proxy will try to reconnect
+        // If not, the proxy will exit
     }
     networking::proxy::ProxyMessage::Exit => {
         // The proxy encountered an error and exited
