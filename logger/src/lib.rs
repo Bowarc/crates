@@ -25,12 +25,17 @@ impl LoggerConfig {
         self.filters.push((name.to_string(), level));
         self
     }
+    fn apply(&self, mut dispatch: fern::Dispatch) -> fern::Dispatch {
+        for filter in &self.filters {
+            dispatch = dispatch.level_for(filter.0.clone(), filter.1);
+        }
+        dispatch = dispatch.level(self.global_level);
+        dispatch
+    }
 }
 
 fn colorise(message: String, level: log::Level) -> colored::ColoredString {
     use colored::Colorize as _;
-    // #[cfg(not(debug_assertions))]
-    // #[cfg(debug_assertions)]
     match level {
         log::Level::Trace => message.normal(),
         log::Level::Debug => message.cyan(),
@@ -41,18 +46,12 @@ fn colorise(message: String, level: log::Level) -> colored::ColoredString {
     }
 }
 
-/*
-    Note
-
-
-    .file = path bcp trop long du fichier qui a demandé le log
-
-    .target = namespace du fichier
-
-*/
-
 fn generate_file_name(record: &log::Record) -> String {
     /*
+        Note
+        .file is the wayyy too long path of the file that called the log
+        .target is the namespace of that file
+
         Extremely boring and very unstable but i don't even care anymore
     */
     let final_file_name = record
@@ -74,30 +73,61 @@ fn generate_file_name(record: &log::Record) -> String {
     }
 }
 
+fn generate_message(message: &std::fmt::Arguments, record: &log::Record, color: bool) -> String {
+    format!(
+        "╭[{time} {level} {file_path}:{line_nbr}]\n╰❯{message}",
+        time = chrono::Local::now().format("%H:%M:%S%.3f"),
+        level = if color {
+            format!("{}", colorise(record.level().to_string(), record.level()))
+        } else {
+            record.level().to_string()
+        },
+        file_path = generate_file_name(record),
+        line_nbr = record
+            .line()
+            .map(|l| l.to_string())
+            .unwrap_or_else(|| "?".to_string()),
+        message = if color {
+            format!("{}", colorise(message.to_string(), record.level()))
+        } else {
+            message.to_string()
+        }
+    )
+}
+
 pub fn init(config: LoggerConfig, log_file_opt: Option<&str>) {
-    let mut builder = fern::Dispatch::new()
-        .format(move |out, message, record| {
-            out.finish(format_args!(
-                "╭[{time} {level} {file_path}:{line_nbr}]\n╰❯{message}",
-                time = chrono::Local::now().format("%H:%M:%S%.3f"),
-                level = colorise(record.level().to_string(), record.level()),
-                file_path = generate_file_name(record),
-                line_nbr = record
-                    .line()
-                    .map(|l| l.to_string())
-                    .unwrap_or_else(|| "?".to_string()),
-                message = colorise(message.to_string(), record.level())
-            ));
+    /*
+        Here we make two dispatchers
+            One that use colored output for stdout,
+            And the seccond one without colors, for a given file
+            (because it's anoying to have a file with ASCII escape codes)
+    */
+
+    let mut dispatch = fern::Dispatch::new().chain({
+        let mut stdout_dispatch = fern::Dispatch::new()
+            .format(move |out, message, record| {
+                out.finish(format_args!("{}", generate_message(message, record, true)));
+            })
+            .level(config.global_level)
+            .chain(std::io::stdout());
+
+        stdout_dispatch = config.apply(stdout_dispatch);
+        stdout_dispatch
+    });
+
+    if let Some(file_path) = log_file_opt {
+        dispatch = dispatch.chain({
+            let mut l = fern::Dispatch::new()
+                .format(move |out, message, record| {
+                    out.finish(format_args!("{}", generate_message(message, record, false)));
+                })
+                .chain(fern::log_file(file_path).unwrap());
+            l = config.apply(l);
+            l
         })
-        .level(config.global_level)
-        .chain(std::io::stdout());
-    if let Some(log_file) = log_file_opt {
-        builder = builder.chain(fern::log_file(log_file).unwrap());
     }
-    for filter in config.filters.iter() {
-        builder = builder.level_for(filter.0.clone(), filter.1);
-    }
-    builder.apply().unwrap();
+
+    dispatch.apply().unwrap();
 
     log_panics::Config::new()
         .backtrace_mode(log_panics::BacktraceMode::Resolved)
