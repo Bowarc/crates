@@ -27,6 +27,7 @@ impl networking::Message for Message {
 
 // Assuming there is a std::net::TcpListener at this address
 let stream = std::net::TcpStream::connect("127.0.0.1:42069").unwrap();
+
 // Read and Write can be different types, for client vs server msg
 let mut socket: networking::Socket<Message, Message> = networking::Socket::new(stream);
 
