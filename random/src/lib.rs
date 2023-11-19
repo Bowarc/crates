@@ -39,7 +39,7 @@ pub fn conflip() -> bool {
     rand::thread_rng().gen_bool(0.5)
 }
 
-/// Samples a String with a given lenght
+/// Samples a String with a given lengh
 pub fn str(len: usize) -> String {
     use rand::distributions::Alphanumeric; // 0.8
     rand::thread_rng()
