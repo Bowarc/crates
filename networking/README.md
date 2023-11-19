@@ -3,7 +3,7 @@
 ### Features
 - Socket: A socket-style wrapper arround rust's `std::net::TcpStream` with generics Read and Write types
 - Proxy: A Socket that lives in another thread to remove the (de)serialisation overhead
-- Stats: A structure used by Proxy that allows you to have basic stats about the proxy (Only round trip time (ping) and the number of bytes exchanged (Overall or over the last 1/10 seconds))
+- Stats: A structure used by Proxy that allows you to have basic stats about the proxy (round trip time (ping) and the number of bytes exchanged (Overall or over the last 1/10 seconds), more later)
 
 
 #### Use example for socket:
