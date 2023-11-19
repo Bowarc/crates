@@ -23,13 +23,14 @@ impl<R, W> Channel<R, W> {
 }
 
 impl<R: std::cmp::PartialEq, W: std::cmp::PartialEq> Channel<R, W> {
-    pub fn wait_for(&self, waited_message: R) {
+    pub fn wait_for(&self, waited_message: R) -> Result<(), std::sync::mpsc::RecvError> {
         loop {
-            let message = self.receiver.recv().unwrap();
+            let message = self.receiver.recv()?;
             if message == waited_message {
                 break;
             }
         }
+        Ok(())
     }
     pub fn wait_for_or_timeout(
         &self,
