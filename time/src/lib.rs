@@ -118,58 +118,6 @@ impl std::fmt::Display for Stopwatch {
     }
 }
 
-#[derive(Copy, Debug, Clone, PartialEq, Eq, Hash)]
-pub struct SystemTimeDelay {
-    instant: std::time::Instant,
-    timeout: u128,
-}
-impl SystemTimeDelay {
-    pub fn new(timeout: u128) -> Self {
-        Self {
-            instant: std::time::Instant::now(),
-            timeout,
-        }
-    }
-    pub fn custom_timeline(timeout: u128, offset: i128) -> Self {
-        // start the timer with an offset, negative or positive idm
-
-        let instant = match offset.cmp(&0) {
-            std::cmp::Ordering::Greater => {
-                std::time::Instant::now() - std::time::Duration::from_millis(offset as u64)
-            }
-            std::cmp::Ordering::Less => {
-                std::time::Instant::now() + std::time::Duration::from_millis(offset as u64)
-            }
-            std::cmp::Ordering::Equal => std::time::Instant::now(),
-        };
-        Self { instant, timeout }
-    }
-    pub fn restart(&mut self) {
-        *self = Self::new(self.timeout)
-    }
-    pub fn fraction(&self) -> f64 {
-        // has to be 0.0<frac<1.0
-        let timeout = self.instant.elapsed().as_millis() as f64;
-
-        timeout / self.timeout as f64
-    }
-    pub fn ended(&self) -> DelayState<u128> {
-        let e = self.instant.elapsed().as_millis();
-
-        if e >= self.timeout {
-            // elapsed?, how much ms has passed since elapsed
-            DelayState::Done(e - self.timeout)
-        } else {
-            DelayState::Running
-        }
-    }
-}
-impl From<u128> for SystemTimeDelay {
-    fn from(timeout: u128) -> SystemTimeDelay {
-        SystemTimeDelay::new(timeout)
-    }
-}
-
 // pub fn display_duration(d: std::time::Duration, separator: &str) -> String {
 //     let mut value: f64 = d.as_nanos() as f64;
 //     // debug!("d:{:?}", d);
