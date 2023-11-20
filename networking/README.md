@@ -6,7 +6,7 @@
 - Stats: A structure used by Proxy that allows you to have basic stats about the proxy (round trip time (ping) and the number of bytes exchanged (Overall or over the last 1/10 seconds), more later)
 
 
-#### Use example for socket:
+#### Use example for Socket:
 
 cargo.toml
 ```toml
