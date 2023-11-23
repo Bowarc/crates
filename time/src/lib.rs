@@ -12,47 +12,47 @@ pub enum DelayState<T> {
 #[serde(from = "f64")]
 /// Mostly used in animations, The Delay is good for waiting (ex: animations frames)
 pub struct DTDelay {
-    starting_timeout: f64,
+    starting_timeout_s: f64,
     #[derivative(PartialEq = "ignore")]
     // i knowingly ignore the emplementation of PartialEq to this field beacause it is so precise that it
     // is impossible for two timeout to be equal
-    timeout: f64, // Set it to the wanted time, (IN SECCONDS) then decrease it with given delta time, when reaches 0, it's done
+    timeout_s: f64, // Set it to the wanted time, (IN SECCONDS) then decrease it with given delta time, when reaches 0, it's done
 }
 
 impl DTDelay {
-    pub fn new(timeout: f64) -> Self {
+    pub fn new(timeout_s: f64) -> Self {
         Self {
-            timeout,
-            starting_timeout: timeout,
+            timeout_s,
+            starting_timeout_s: timeout_s,
         }
     }
-    pub fn new_custom_timeline(timeout: f64, offset: f64) -> Self {
+    pub fn new_custom_timeline(timeout_s: f64, offset: f64) -> Self {
         Self {
-            timeout: timeout - offset,
-            starting_timeout: timeout,
+            timeout_s: timeout_s - offset,
+            starting_timeout_s: timeout_s,
         }
     }
     pub fn restart(&mut self) {
-        *self = Self::new(self.starting_timeout)
+        *self = Self::new(self.starting_timeout_s)
     }
     pub fn update(&mut self, dt: f64) {
-        self.timeout -= dt;
+        self.timeout_s -= dt;
     }
     pub fn fraction(&self) -> f64 {
         // has to be 0.0<frac<1.0
-        self.timeout / self.starting_timeout
+        self.timeout_s / self.starting_timeout_s
     }
     pub fn ended(&self) -> bool {
-        self.timeout <= 0f64
+        self.timeout_s <= 0f64
     }
     pub fn time_since_ended(&self) -> f64 {
-        self.timeout * -1. // if this is negative, the delay is not finished yet
+        self.timeout_s * -1. // if this is negative, the delay is not finished yet
     }
 }
 
 impl From<f64> for DTDelay {
-    fn from(timeout: f64) -> DTDelay {
-        DTDelay::new(timeout)
+    fn from(timeout_s: f64) -> DTDelay {
+        DTDelay::new(timeout_s)
     }
 }
 
