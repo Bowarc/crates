@@ -21,7 +21,7 @@ impl<SRCW: crate::Message, SWCR: crate::Message> NetworkStats<SRCW, SWCR> {
             } else {
                 None
             },
-            rtt_opt: if cfg.bps.enabled {
+            rtt_opt: if cfg.rtt.enabled {
                 Some(rtt::Rtt::new(cfg.rtt))
             } else {
                 None
