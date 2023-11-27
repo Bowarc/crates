@@ -143,6 +143,7 @@ impl<SRCW: crate::Message + 'static, SWCR: crate::Message + 'static> Proxy<SRCW,
 
             if let Err(e) = stats.update(&mut self.channel, socket) {
                 warn!("Stats update encountered an error: {e:?}, stopping proxy");
+                self.reset_connection();
                 if self.cfg.auto_reconnect {
                     continue;
                 } else {
@@ -152,6 +153,7 @@ impl<SRCW: crate::Message + 'static, SWCR: crate::Message + 'static> Proxy<SRCW,
 
             if let Err(e) = self.handle_channel(&mut stats) {
                 warn!("Proxy encountered an error while handling channel {e:?}");
+                self.reset_connection();
                 if self.cfg.auto_reconnect {
                     continue;
                 } else {
@@ -161,6 +163,7 @@ impl<SRCW: crate::Message + 'static, SWCR: crate::Message + 'static> Proxy<SRCW,
 
             if let Err(e) = self.handle_socket(&mut stats) {
                 warn!("Proxy encountered an error while handling socket {e:?}");
+                self.reset_connection();
                 if self.cfg.auto_reconnect {
                     continue;
                 } else {

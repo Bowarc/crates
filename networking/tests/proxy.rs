@@ -12,7 +12,7 @@ fn proxy() {
         /*
         Methods of this trait are used for stat calculation
         if you want to enable the stats, don't forget to impl thoses
-
+        
         IMPORTANT
             When RTT stat is disabled in proxy config, the proxy will not anwser to any ping
             calls from the remote, therefore their rtt calculation will not work.
