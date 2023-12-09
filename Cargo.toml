@@ -1,9 +1,10 @@
 [workspace]
 members = [
+    "enum_variant_name",
     "logger",
-    "threading",
-    "random",
     "mem",
+    "networking",
+    "random",
+    "threading",
     "time",
-    "networking"
 ]

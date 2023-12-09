@@ -18,6 +18,6 @@ let cfg = logger::LoggerConfig::new()
     .add_filter("naga", log::LevelFilter::Warn)
     .add_filter("networking", log::LevelFilter::Debug)
     .add_filter("ggez", log::LevelFilter::Warn);
-// Set the seccond parametter to None if you don't want any log file
+// Set the second parametter to None if you don't want any log file
 logger::init(cfg, Some("log_file.log"));
 ``` 
