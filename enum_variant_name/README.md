@@ -5,7 +5,7 @@
 cargo.toml
 ```toml
 [dependencies]
-logger = {git = "https://github.com/Bowarc/Crates.git", package = "enum_variant_name"}
+enum_variant_name = {git = "https://github.com/Bowarc/Crates.git", package = "enum_variant_name"}
 ``` 
 main.rs
 ```rust
