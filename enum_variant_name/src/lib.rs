@@ -37,7 +37,7 @@ pub fn variant_name(input: TokenStream) -> TokenStream {
 
     let expanded = quote! {
         impl #impl_generics #name #ty_generics #where_clause {
-            fn variant_name(&self) -> &'static str {
+            pub fn variant_name(&self) -> &'static str {
                 #match_arms
             }
         }
