@@ -35,7 +35,7 @@ impl<SRCW: crate::Message, SWCR: crate::Message> NetworkStats<SRCW, SWCR> {
         &mut self,
         _channel: &mut threading::Channel<SWCR, super::proxy::ProxyMessage<SRCW>>,
         socket: &mut crate::Socket<SRCW, SWCR>,
-    ) -> Result<(), crate::socket::SocketError> {
+    ) -> Result<(), crate::proxy::ProxyError> {
         if self.cfg.rtt.enabled {
             self.update_rtt(socket)?;
         }
@@ -50,7 +50,7 @@ impl<SRCW: crate::Message, SWCR: crate::Message> NetworkStats<SRCW, SWCR> {
     fn update_rtt(
         &mut self,
         socket: &mut crate::Socket<SRCW, SWCR>,
-    ) -> Result<(), crate::socket::SocketError> {
+    ) -> Result<(), crate::proxy::ProxyError> {
         let Some(rtt) = &mut self.rtt_opt else{
             return Ok(())
         };
@@ -58,7 +58,7 @@ impl<SRCW: crate::Message, SWCR: crate::Message> NetworkStats<SRCW, SWCR> {
         if rtt.needs_ping() {
             let msg = SWCR::default_ping();
             self.on_msg_send(&msg);
-            let header = socket.send(msg)?;
+            let header = socket.send(msg).map_err(|e| crate::proxy::ProxyError::SocketSend(e.to_string()))?;
             self.on_bytes_send(&header);
         }
 
