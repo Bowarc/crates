@@ -142,7 +142,7 @@ impl<SRCW: crate::Message + 'static, SWCR: crate::Message + 'static> Proxy<SRCW,
             };
 
             if let Err(e) = stats.update(&mut self.channel, socket) {
-                warn!("Stats update encountered an error: {e:?}, stopping proxy");
+                warn!("Stats update encountered an error: {e:?}");
                 self.reset_connection();
                 if self.cfg.auto_reconnect {
                     continue;
@@ -151,17 +151,13 @@ impl<SRCW: crate::Message + 'static, SWCR: crate::Message + 'static> Proxy<SRCW,
                 }
             }
 
-            if let Err(e) = self.handle_channel(&mut stats) {
+            if let Err(e) = self.handle_local(&mut stats) {
                 warn!("Proxy encountered an error while handling channel {e:?}");
                 self.reset_connection();
-                if self.cfg.auto_reconnect {
-                    continue;
-                } else {
-                    break;
-                }
+                break; // https://github.com/Bowarc/Crates/issues/10
             }
 
-            if let Err(e) = self.handle_socket(&mut stats) {
+            if let Err(e) = self.handle_distant(&mut stats) {
                 warn!("Proxy encountered an error while handling socket {e:?}");
                 self.reset_connection();
                 if self.cfg.auto_reconnect {
@@ -193,7 +189,7 @@ impl<SRCW: crate::Message + 'static, SWCR: crate::Message + 'static> Proxy<SRCW,
         debug!("Proxy for ({}) has exited", self.cfg.addr);
     }
     /// here you receive the message sent by the channel
-    fn handle_channel(
+    fn handle_local(
         &mut self,
         stats: &mut super::NetworkStats<SRCW, SWCR>,
     ) -> Result<(), super::NetworkError> {
@@ -220,8 +216,8 @@ impl<SRCW: crate::Message + 'static, SWCR: crate::Message + 'static> Proxy<SRCW,
         Ok(())
     }
 
-    /// here you receive message sent by the client
-    fn handle_socket(
+    /// here you receive message sent by the socket
+    fn handle_distant(
         &mut self,
         stats: &mut super::NetworkStats<SRCW, SWCR>,
     ) -> Result<(), super::NetworkError> {
@@ -259,7 +255,7 @@ impl<SRCW: crate::Message + 'static, SWCR: crate::Message + 'static> Proxy<SRCW,
                         }
                     } else {
                         error!(
-                            "Error while listening socket {}, aborting: {e}",
+                            "Error while listening socket {}: {e}",
                             socket.remote_addr()
                         );
                     }
