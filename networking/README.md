@@ -50,7 +50,7 @@ let _sent_res: Result<networking::socket::Header, networking::socket::SocketErro
 cargo.toml
 ```toml
 [dependencies]
-logger = {git = "https://github.com/Bowarc/Crates.git", package = "networking"}
+networking = {git = "https://github.com/Bowarc/Crates.git", package = "networking"}
 serde = { version = "1.0.188", features = ["derive"] }
 ``` 
 
