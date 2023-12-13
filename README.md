@@ -6,8 +6,6 @@ For more information about each one, please take a look at their readme.
 [logger](logger/README.md)  
 [mem](mem/README.md)  
 [networking](networking/README.md)  
+[random](random/README.md)  
 [threading](threading/README.md)  
 [time](time/README.md)  
-[random](random/README.md)  
-
-
