@@ -1,11 +1,11 @@
-## Simpe random number and string generation
+## Simple random number and string generation
 
 #### Use example:
 
 cargo.toml
 ```toml
 [dependencies]
-logger = {git = "https://github.com/Bowarc/Crates.git", package = "random"}
+random = {git = "https://github.com/Bowarc/Crates.git", package = "random"}
 ``` 
 main.rs
 ```rust
