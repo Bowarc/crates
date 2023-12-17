@@ -1,4 +1,4 @@
-## Derive to get the variant name of an enum
+## Derive macro to get the variant name of an enum
 
 #### Use example:
 

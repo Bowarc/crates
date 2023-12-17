@@ -5,7 +5,7 @@
 cargo.toml
 ```toml
 [dependencies]
-threading = {git = "https://github.com/Bowarc/Crates.git", package = "time"}
+time = {git = "https://github.com/Bowarc/Crates.git", package = "time"}
 ``` 
 main.rs
 ```rust

@@ -19,6 +19,7 @@ enum T2Msg {
     Hellow,
 }
 
+// Every channel can send to and receive from it's linked counterpart 
 let (c1, c2) = threading::Channel::<T1Msg, T2Msg>::new_pair();
 
 std::thread::spawn(move || c2.send(T2Msg::Hi));
