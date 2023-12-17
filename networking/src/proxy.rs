@@ -223,8 +223,8 @@ impl<SRCW: crate::Message + 'static, SWCR: crate::Message + 'static> Proxy<SRCW,
             error!("Could not send exit message to main thread: {e}")
         }
 
-        self.running
-            .store(false, std::sync::atomic::Ordering::Relaxed);
+        self.set_running(false);
+        self.set_connected(false);
 
         if let Some(socket) = self.socket_opt {
             socket.shutdown();
