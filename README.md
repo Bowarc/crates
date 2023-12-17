@@ -1,4 +1,4 @@
-The collection of crates that i use in some of my projects
+Some self made crates i use in some of my projects
 
 For more information about each one, please take a look at their readme.
 
