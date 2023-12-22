@@ -12,9 +12,7 @@
 
 - [**Threading**](threading/README.md): Simplifies threading operations, making concurrent programming in Rust more manageable and efficient.
 
-- [**Threading**](threading/README.md): Bundle of std::sync::mpsc::Sender and std::sync::mpsc::Receiver with some added methods.
-
-- [**Time**](time/README.md): Time manipulation utilities that facilitate handling time-related operations in Rust applications.
+- [**Threading**](threading/README.md): Bundle of `std::sync::mpsc::Sender` and `std::sync::mpsc::Receiver` with some added methods.
 
 - [**Time**](time/README.md): Simple delay, stopwatch, function timing and time formatting.
 
