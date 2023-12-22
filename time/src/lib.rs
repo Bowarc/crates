@@ -114,58 +114,83 @@ impl Stopwatch {
 
 impl std::fmt::Display for Stopwatch {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", display_duration(self.read()))
+        write!(f, "{}", format(self.read()))
     }
 }
 
-// pub fn display_duration(d: std::time::Duration, separator: &str) -> String {
-//     let mut value: f64 = d.as_nanos() as f64;
-//     // debug!("d:{:?}", d);
-//     // if nanos == 0 {}
-//     // debug!("nbr: {}", nbr);
+pub fn format(duration: std::time::Duration) -> String {
 
-//     let units: Vec<&str> = vec!["ns", "µs", "ms", "s"];
-//     let mut name_index = 0;
+    const NANOS_IN_MICROSECOND: f64 = 1_000.0;
+    const NANOS_IN_MILLISECOND: f64 = 1_000_000.0;
+    const NANOS_IN_SECOND: f64 = 1_000_000_000.0;
+    const NANOS_IN_MINUTE: f64 = NANOS_IN_SECOND * 60.0;
+    const NANOS_IN_HOUR: f64 = NANOS_IN_MINUTE * 60.0;
+    const NANOS_IN_DAY: f64 = NANOS_IN_HOUR * 24.0;
+    const NANOS_IN_WEEK: f64 = NANOS_IN_DAY * 7.0;
+    const NANOS_IN_YEAR: f64 = NANOS_IN_DAY * 365.0;
 
-//     while value >= 1_000. {
-//         if name_index < units.len() - 1 {
-//             value /= 1_000.;
-//             name_index += 1
-//         } else {
-//             break;
-//         }
-//     }
-//     format!("{:.2}{}{}", value, separator, units[name_index])
-// }
+    let total_nanos = duration.as_nanos() as f64;
 
-pub fn display_duration(duration: std::time::Duration) -> String {
-    let secs = duration.as_secs();
-    let nanos = duration.subsec_nanos();
-
-    if secs == 0 {
-        if nanos < 1_000 {
-            return format!("{}ns", nanos);
-        } else if nanos < 1_000_000 {
-            return format!("{:.2}µs", nanos as f64 / 1_000.0);
-        } else {
-            return format!("{:.2}ms", nanos as f64 / 1_000_000.0);
-        }
+    if total_nanos < 1.0 {
+        return format!("{:.0}ns", total_nanos);
     }
 
-    if secs < 60 {
-        format!("{secs}s")
-    } else if secs < 3_600 {
-        let minutes = secs / 60;
-        let seconds = secs % 60;
-        format!("{minutes}m {seconds}s")
-    } else if secs < 86_400 {
-        let hours = secs / 3_600;
-        let minutes = (secs % 3_600) / 60;
-        format!("{hours}h {minutes}m")
-    } else {
-        let days = secs / 86_400;
-        format!("{days}days")
+    let mut remaining_nanos = total_nanos;
+    let mut formatted_duration = String::new();
+
+    if remaining_nanos >= NANOS_IN_YEAR {
+        let years = remaining_nanos / NANOS_IN_YEAR;
+        formatted_duration.push_str(&format!("{:.0}y ", years));
+        remaining_nanos %= NANOS_IN_YEAR;
     }
+
+    if remaining_nanos >= NANOS_IN_WEEK {
+        let weeks = remaining_nanos / NANOS_IN_WEEK;
+        formatted_duration.push_str(&format!("{:.0}w ", weeks));
+        remaining_nanos %= NANOS_IN_WEEK;
+    }
+
+    if remaining_nanos >= NANOS_IN_DAY {
+        let days = remaining_nanos / NANOS_IN_DAY;
+        formatted_duration.push_str(&format!("{:.0}d ", days));
+        remaining_nanos %= NANOS_IN_DAY;
+    }
+
+    if remaining_nanos >= NANOS_IN_HOUR {
+        let hours = remaining_nanos / NANOS_IN_HOUR;
+        formatted_duration.push_str(&format!("{:.0}h ", hours));
+        remaining_nanos %= NANOS_IN_HOUR;
+    }
+
+    if remaining_nanos >= NANOS_IN_MINUTE {
+        let minutes = remaining_nanos / NANOS_IN_MINUTE;
+        formatted_duration.push_str(&format!("{:.0}m ", minutes));
+        remaining_nanos %= NANOS_IN_MINUTE;
+    }
+
+    if remaining_nanos >= NANOS_IN_SECOND {
+        let seconds = remaining_nanos / NANOS_IN_SECOND;
+        formatted_duration.push_str(&format!("{:.0}s ", seconds));
+        remaining_nanos %= NANOS_IN_SECOND;
+    }
+
+    if remaining_nanos >= NANOS_IN_MILLISECOND{
+        let milis = remaining_nanos / NANOS_IN_MILLISECOND;
+        formatted_duration.push_str(&format!("{:.0}ms ", milis));
+        remaining_nanos %= NANOS_IN_MILLISECOND;
+    }
+
+    if remaining_nanos >= NANOS_IN_MICROSECOND{
+        let micro = remaining_nanos / NANOS_IN_MICROSECOND;
+        formatted_duration.push_str(&format!("{:.0}µs ", micro));
+        remaining_nanos %= NANOS_IN_MICROSECOND;
+    }
+
+    if remaining_nanos > 0.0 {
+        formatted_duration.push_str(&format!("{:.0}ns", remaining_nanos));
+    }
+
+    formatted_duration.trim().to_string()
 }
 
 pub fn timeit<F: Fn() -> T, T>(f: F) -> (T, std::time::Duration) {

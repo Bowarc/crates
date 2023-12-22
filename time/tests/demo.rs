@@ -30,7 +30,7 @@ fn all() {
 
     // Formatting
     let d = std::time::Duration::from_secs(3600);
-    println!("{}", time::display_duration(d)); // 1h 0m
+    println!("{}", time::format(d)); // 1h
 
     // Time a function
 
@@ -45,7 +45,7 @@ fn all() {
     let (fn_out, dur): (bool, std::time::Duration) = time::timeit(|| fn1(15));
     println!(
         "fn1 ran for {} and returnred {}",
-        time::display_duration(dur),
+        time::format(dur),
         fn_out
     );
 
@@ -57,7 +57,7 @@ fn all() {
     let (fn_out, dur): (i32, std::time::Duration) = time::timeit(fn2);
     println!(
         "fn2 ran for {} and returnred {}",
-        time::display_duration(dur),
+        time::format(dur),
         fn_out
     );
 
@@ -72,7 +72,7 @@ fn all() {
     let (fn_out, dur): ((), std::time::Duration) = time::timeit_mut(|| fn3(&mut x));
     println!(
         "fn3 ran for {} and returnred {:?}",
-        time::display_duration(dur),
+        time::format(dur),
         fn_out
     );
 }

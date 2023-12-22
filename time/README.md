@@ -76,4 +76,4 @@ let (fn_out, dur): ((), std::time::Duration) = time::timeit_mut(|| fn3(&mut x));
 
 println!("fn3 ran for {} and returnred {:?}", time::display_duration(dur), fn_out);
 // fn3 ran for 512.75ms and returnred ()
-``` 
+```
