@@ -174,6 +174,11 @@ pub fn timeit<F: Fn() -> T, T>(f: F) -> (T, std::time::Duration) {
     //! ```
     //! let (output, duration) = timeit( || my_function() )
     //! ```
+
+    // The order of the output is important as it's also the order that it's computed
+    // if you output (start.elapsed(), f()), the timer is stopped before the function actually starts
+    // you'll need to compute f() before and store it in an ouput variable
+
     let start = std::time::Instant::now();
     // let output = f();
     (f(), start.elapsed())
@@ -186,10 +191,20 @@ pub fn timeit_mut<F: FnMut() -> T, T>(mut f: F) -> (T, std::time::Duration) {
     //! let (output, duration) = timeit_mut( || my_function() )
     //! ```
 
-    // the order of the output is important as it's also the order that it's cumputed
-    // if you output (start.elapsed(), f()), the timer is stopped before the function actually starts
-    // you'll need to compute f() before and store it in an ouput variable
     let start = std::time::Instant::now();
     // let output = f();
     (f(), start.elapsed())
+}
+
+pub async fn timeit_async<F: std::future::Future<Output = T>, T>(f: F) -> (T, std::time::Duration) {
+    //! Used to time the execution of a function with mutable parameters
+    //! # Example
+    //! ```
+    //! let (output, duration) = timeit_async( my_future )
+    //!
+    //! ```
+
+    let start = std::time::Instant::now();
+    // let output = f();
+    (f.await, start.elapsed())
 }

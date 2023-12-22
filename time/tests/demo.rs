@@ -49,7 +49,7 @@ fn all() {
         fn_out
     );
 
-    let fn2 = || -> i32{
+    let fn2 = || -> i32 {
         std::thread::sleep(std::time::Duration::from_secs_f32(1.2));
         15
     };
