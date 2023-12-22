@@ -9,9 +9,7 @@
 - [**Networking**](networking/README.md): Simplifies TCP connections with socket-style wrapper around `std::net::TcpStream` and a proxy mechanism that offers basic stats calculation for round-trip time and bytes exchanged.
 
 - [**Random**](random/README.md): Essential tools for randomization.
-
-- [**Threading**](threading/README.md): Simplifies threading operations, making concurrent programming in Rust more manageable and efficient.
-
+- 
 - [**Threading**](threading/README.md): Bundle of `std::sync::mpsc::Sender` and `std::sync::mpsc::Receiver` with some added methods.
 
 - [**Time**](time/README.md): Simple delay, stopwatch, function timing and time formatting.
