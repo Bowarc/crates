@@ -1,11 +1,22 @@
-Some self made crates i use in some of my projects.
+## Here are some Rust crates I've developed for different tasks in my projects. Each one is made to simplify specific functionalities.
 
-For more information about each one, please take a look at their readme.
+- [**Enum Variant Name**](enum_variant_name/README.md): Provides a convenient derive macro to retrieve the variant name of an enum in Rust.
 
-[enum variant name](enum_variant_name/README.md)  
-[logger](logger/README.md)  
-[mem](mem/README.md)  
-[networking](networking/README.md)  
-[random](random/README.md)  
-[threading](threading/README.md)  
-[time](time/README.md)  
+- [**Logger**](logger/README.md): Straightforward wrapper around the [fern](https://docs.rs/fern) logger, simplifying logging configuration and setup.
+
+- [**Mem**](mem/README.md): Nothing really interesting here.
+
+- [**Networking**](networking/README.md): Simplifies TCP connections with socket-style wrapper around `std::net::TcpStream` and a proxy mechanism that offers basic stats calculation for round-trip time and bytes exchanged.
+
+- [**Random**](random/README.md): Essential tools for randomization.
+
+- [**Threading**](threading/README.md): Simplifies threading operations, making concurrent programming in Rust more manageable and efficient.
+
+- [**Threading**](threading/README.md): Bundle of std::sync::mpsc::Sender and std::sync::mpsc::Receiver with some added methods.
+
+- [**Time**](time/README.md): Time manipulation utilities that facilitate handling time-related operations in Rust applications.
+
+- [**Time**](time/README.md): Simple delay, stopwatch, function timing and time formatting.
+
+
+Please check each crate's readme for more detailed information on their usage.

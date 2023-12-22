@@ -51,7 +51,7 @@ let fn1 = |x: i32| -> bool {
 
 let (fn_out, dur): (bool, std::time::Duration) = time::timeit(|| fn1(15));
 
-println!("fn1 ran for {} and returnred {}", time::display_duration(dur), fn_out);
+println!("fn1 ran for {} and returnred {}", time::format(dur), fn_out);
 // fn1 ran for 200ns and returnred true
 
 let fn2 = || -> i32{
@@ -61,7 +61,7 @@ let fn2 = || -> i32{
 
 let (fn_out, dur): (i32, std::time::Duration) = time::timeit(fn2);
 
-println!("fn2 ran for {} and returnred {}", time::display_duration(dur), fn_out);
+println!("fn2 ran for {} and returnred {}", time::format(dur), fn_out);
 // fn2 ran for 1s and returnred 15
 
 // Mutable args
@@ -74,6 +74,17 @@ let fn3 = |x: &mut i32| {
 
 let (fn_out, dur): ((), std::time::Duration) = time::timeit_mut(|| fn3(&mut x));
 
-println!("fn3 ran for {} and returnred {:?}", time::display_duration(dur), fn_out);
+println!("fn3 ran for {} and returnred {:?}", time::format(dur), fn_out);
 // fn3 ran for 512.75ms and returnred ()
+
+
+/* -----------------------
+   Async runtime needed 
+------------------------*/
+async fn fn4() -> String {
+    tokio::time::sleep(tokio::time::Duration::from_secs(2)).await;
+    "Hi".to_string()
+}
+let (fn_out, dur) = timeit_async(fn4()).await;
+println!("fn4 ran for {} and returnred {:?}", time::format(dur), fn_out);
 ```
