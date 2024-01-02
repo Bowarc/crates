@@ -30,7 +30,7 @@ fn all() {
 
     // Formatting
     let d = std::time::Duration::from_secs(3600);
-    println!("{}", time::format(d)); // 1h
+    println!("{}", time::format(d)); // 1h 0m
 
     // Time a function
 
@@ -43,23 +43,19 @@ fn all() {
     };
 
     let (fn_out, dur): (bool, std::time::Duration) = time::timeit(|| fn1(15));
-    println!(
-        "fn1 ran for {} and returnred {}",
-        time::format(dur),
-        fn_out
-    );
 
-    let fn2 = || -> i32 {
+    println!("fn1 ran for {} and returnred {}", time::format(dur), fn_out);
+    // fn1 ran for 200ns and returnred true
+
+    let fn2 = || -> i32{
         std::thread::sleep(std::time::Duration::from_secs_f32(1.2));
         15
     };
 
     let (fn_out, dur): (i32, std::time::Duration) = time::timeit(fn2);
-    println!(
-        "fn2 ran for {} and returnred {}",
-        time::format(dur),
-        fn_out
-    );
+
+    println!("fn2 ran for {} and returnred {}", time::format(dur), fn_out);
+    // fn2 ran for 1s and returnred 15
 
     // Mutable args
     let mut x = 20;
@@ -70,9 +66,7 @@ fn all() {
     };
 
     let (fn_out, dur): ((), std::time::Duration) = time::timeit_mut(|| fn3(&mut x));
-    println!(
-        "fn3 ran for {} and returnred {:?}",
-        time::format(dur),
-        fn_out
-    );
+
+    println!("fn3 ran for {} and returnred {:?}", time::format(dur), fn_out);
+    // fn3 ran for 512.75ms and returnred ()
 }

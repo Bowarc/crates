@@ -193,11 +193,17 @@ pub fn format(duration: std::time::Duration) -> String {
     formatted_duration.trim().to_string()
 }
 
-pub fn timeit<F: Fn() -> T, T>(f: F) -> (T, std::time::Duration) {
+pub fn timeit<F: FnOnce() -> T, T>(f: F) -> (T, std::time::Duration) {
     //! Used to time the execution of a function with immutable parameters
     //! # Example
     //! ```
-    //! let (output, duration) = timeit( || my_function() )
+    //! use time::timeit;
+    //!
+    //! fn my_function(){
+    //!     std::thread::sleep(std::time::Duration::from_secs(2));
+    //! }
+    //!
+    //! let (output, duration) = timeit( || my_function() );
     //! ```
 
     // The order of the output is important as it's also the order that it's computed
@@ -213,7 +219,15 @@ pub fn timeit_mut<F: FnMut() -> T, T>(mut f: F) -> (T, std::time::Duration) {
     //! Used to time the execution of a function with mutable parameters
     //! # Example
     //! ```
-    //! let (output, duration) = timeit_mut( || my_function() )
+    //! use time::timeit_mut;
+    //!
+    //! fn my_mut_function(x: &mut i32){
+    //!     std::thread::sleep(std::time::Duration::from_secs(2));
+    //!     *x += 1
+    //! }
+    //! 
+    //! let mut y = 5;
+    //! let (output, duration) = timeit_mut( || my_mut_function(&mut y) );
     //! ```
 
     let start = std::time::Instant::now();
@@ -225,7 +239,16 @@ pub async fn timeit_async<F: std::future::Future<Output = T>, T>(f: impl FnOnce(
     //! Used to time the execution of a function with mutable parameters
     //! # Example
     //! ```
-    //! let (output, duration) = timeit_async( || my_async_function() )
+    //! use time::timeit_async;
+    //!
+    //! async fn my_async_function() -> bool{
+    //!     std::thread::sleep(std::time::Duration::from_secs(2));
+    //!     true
+    //! }
+    //!
+    //! async fn _main(){
+    //!     let (output, duration) = timeit_async( || my_async_function() ).await;
+    //! }
     //!
     //! ```
 
