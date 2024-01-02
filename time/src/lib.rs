@@ -221,15 +221,15 @@ pub fn timeit_mut<F: FnMut() -> T, T>(mut f: F) -> (T, std::time::Duration) {
     (f(), start.elapsed())
 }
 
-pub async fn timeit_async<F: std::future::Future<Output = T>, T>(f: F) -> (T, std::time::Duration) {
+pub async fn timeit_async<F: std::future::Future<Output = T>, T>(f: impl FnOnce() -> F) -> (T, std::time::Duration) {
     //! Used to time the execution of a function with mutable parameters
     //! # Example
     //! ```
-    //! let (output, duration) = timeit_async( my_future )
+    //! let (output, duration) = timeit_async( || my_async_function() )
     //!
     //! ```
 
     let start = std::time::Instant::now();
-    // let output = f();
-    (f.await, start.elapsed())
+    // let output = f().await;
+    (f().await, start.elapsed())
 }

@@ -85,6 +85,6 @@ async fn fn4() -> String {
     tokio::time::sleep(tokio::time::Duration::from_secs(2)).await;
     "Hi".to_string()
 }
-let (fn_out, dur) = timeit_async(fn4()).await;
+let (fn_out, dur) = timeit_async(|| fn4()).await;
 println!("fn4 ran for {} and returnred {:?}", time::format(dur), fn_out);
 ```
