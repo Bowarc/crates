@@ -124,37 +124,37 @@ impl<SRCW: crate::Message, SWCR: crate::Message> NetworkStats<SRCW, SWCR> {
 
 //bps
 impl<SRCW: crate::Message, SWCR: crate::Message> NetworkStats<SRCW, SWCR> {
-    pub fn total_received(&self) -> usize {
+    pub fn total_received(&self) -> u64 {
         self.bps_opt
             .as_ref()
             .map(|bps| bps.total_received())
             .unwrap_or(0)
     }
-    pub fn total_sent(&self) -> usize {
+    pub fn total_sent(&self) -> u64 {
         self.bps_opt
             .as_ref()
             .map(|bps| bps.total_sent())
             .unwrap_or(0)
     }
-    pub fn received_last_10_sec(&self) -> usize {
+    pub fn received_last_10_sec(&self) -> u64 {
         self.bps_opt
             .as_ref()
             .map(|bps| bps.received_last_10_sec())
             .unwrap_or(0)
     }
-    pub fn bps_received_last_10_sec(&self) -> usize {
+    pub fn bps_received_last_10_sec(&self) -> u64 {
         self.bps_opt
             .as_ref()
             .map(|bps| bps.bps_received_last_10_sec())
             .unwrap_or(0)
     }
-    pub fn sent_last_10_sec(&self) -> usize {
+    pub fn sent_last_10_sec(&self) -> u64 {
         self.bps_opt
             .as_ref()
             .map(|bps| bps.sent_last_10_sec())
             .unwrap_or(0)
     }
-    pub fn bps_sent_last_10_sec(&self) -> usize {
+    pub fn bps_sent_last_10_sec(&self) -> u64 {
         self.bps_opt
             .as_ref()
             .map(|bps| bps.bps_sent_last_10_sec())

@@ -1,4 +1,4 @@
-pub const HEADER_SIZE: usize = std::mem::size_of::<Header>();
+pub const HEADER_SIZE: u64 = std::mem::size_of::<Header>() as u64;
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Copy)]
 // You can modify this struct to store whatever data you want, just be sure that your data's size can't change as it
@@ -6,7 +6,7 @@ pub const HEADER_SIZE: usize = std::mem::size_of::<Header>();
 // (Ex: if the header struct contains a Vec or a String (dyamic sized object), depending on the number of elements
 // the field changes size (therefore the Header struct too), which makes the HEADER_SIZE constant unrepresntative of the real Header size)
 pub struct Header {
-    pub size: usize,
+    pub size: u64,
 }
 
 // I don't like how streams work so i'll make a simple socket-like, packet-based struct wrapper
@@ -36,7 +36,7 @@ pub enum SocketError {
 }
 
 impl Header {
-    pub fn new(size: usize) -> Self {
+    pub fn new(size: u64) -> Self {
         Self { size }
     }
 }
@@ -55,13 +55,13 @@ impl<R: crate::Message, W: crate::Message> Socket<R, W> {
 
         let message_bytes = bincode::serialize(&message).map_err(SocketError::Serialization)?;
 
-        let header = Header::new(message_bytes.len());
+        let header = Header::new(message_bytes.len() as u64);
 
         let header_bytes = bincode::serialize(&header).map_err(SocketError::Serialization)?;
 
         // idk if panicking is a good idea
         // assert_eq!(header_bytes.len(), HEADER_SIZE);
-        if header_bytes.len() != HEADER_SIZE {
+        if header_bytes.len() as u64 != HEADER_SIZE {
             return Err(SocketError::Serialization(Box::new(bincode::ErrorKind::Custom(format!("The length of the serialized header is not equal to the HEADER_SIZE constant ({HEADER_SIZE})"))),));
         }
 
@@ -100,15 +100,15 @@ impl<R: crate::Message, W: crate::Message> Socket<R, W> {
 
     fn try_get<T: serde::de::DeserializeOwned + std::fmt::Debug>(
         &mut self,
-        target_size: usize,
+        target_size: u64,
     ) -> Result<T, SocketError> {
         use std::io::Read as _;
-        let mut peek_buffer = vec![0; target_size];
+        let mut peek_buffer = vec![0; target_size as usize];
 
         let read_len = self
             .stream
             .peek(&mut peek_buffer)
-            .map_err(SocketError::StreamRead)?;
+            .map_err(SocketError::StreamRead)? as u64;
 
         if read_len != 0 {
             trace!(
@@ -128,7 +128,7 @@ impl<R: crate::Message, W: crate::Message> Socket<R, W> {
             )));
         }
 
-        let mut message_buffer = vec![0; target_size];
+        let mut message_buffer = vec![0; target_size as usize];
 
         self.stream
             .read_exact(&mut message_buffer)

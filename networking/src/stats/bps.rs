@@ -1,7 +1,7 @@
 #[derive(Clone)]
 pub struct Bps {
-    total_sent: usize,
-    total_received: usize,
+    total_sent: u64,
+    total_received: u64,
 
     rolling_window: Vec<WindowEntry>,
     cfg: super::config::BpsConfig,
@@ -13,8 +13,8 @@ pub struct Bps {
 #[derive(Clone)]
 pub struct WindowEntry {
     time: std::time::Instant,
-    bytes_sent: usize,
-    bytes_received: usize,
+    bytes_sent: u64,
+    bytes_received: u64,
 }
 
 impl Bps {
@@ -47,28 +47,28 @@ impl Bps {
         // println!("{} windows", self.rolling_window.len());
     }
 
-    pub fn total_received(&self) -> usize {
+    pub fn total_received(&self) -> u64 {
         self.total_received
     }
-    pub fn total_sent(&self) -> usize {
+    pub fn total_sent(&self) -> u64 {
         self.total_sent
     }
-    pub fn received_last_10_sec(&self) -> usize {
+    pub fn received_last_10_sec(&self) -> u64 {
         self.rolling_window
             .iter()
             .map(|entry| entry.bytes_received)
-            .sum::<usize>()
+            .sum::<u64>()
     }
-    pub fn bps_received_last_10_sec(&self) -> usize {
+    pub fn bps_received_last_10_sec(&self) -> u64 {
         self.received_last_10_sec() / 10
     }
-    pub fn sent_last_10_sec(&self) -> usize {
+    pub fn sent_last_10_sec(&self) -> u64 {
         self.rolling_window
             .iter()
             .map(|entry| entry.bytes_sent)
-            .sum::<usize>()
+            .sum::<u64>()
     }
-    pub fn bps_sent_last_10_sec(&self) -> usize {
+    pub fn bps_sent_last_10_sec(&self) -> u64 {
         self.sent_last_10_sec() / 10
     }
     pub fn on_bytes_recv(&mut self, header: &crate::socket::Header) {
