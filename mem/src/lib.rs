@@ -1,9 +1,9 @@
-pub fn display_bytes(bytes: usize) -> String {
-    const KB: usize = 1024;
-    const MB: usize = KB * 1024;
-    const GB: usize = MB * 1024;
-    const TB: usize = GB * 1024;
-    const PB: usize = TB * 1024;
+pub fn display_bytes(bytes: u64) -> String {
+    const KB: u64 = 1024;
+    const MB: u64 = KB * 1024;
+    const GB: u64 = MB * 1024;
+    const TB: u64 = GB * 1024;
+    const PB: u64 = TB * 1024;
 
     if bytes < KB {
         format!("{}B", bytes)
