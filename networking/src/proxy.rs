@@ -1,13 +1,12 @@
 mod config;
-mod message;
-mod error;
 mod controller;
-
+mod error;
+mod message;
 
 pub use config::ProxyConfig;
-pub use message::ProxyMessage;
-pub use error::ProxyError;
 pub use controller::ProxyController;
+pub use error::ProxyError;
+pub use message::ProxyMessage;
 
 // as args, do i say that Read is the local or distant
 // Socket Read Channel Write
@@ -20,9 +19,6 @@ pub struct Proxy<SRCW: crate::Message, SWCR: crate::Message> {
     connected: std::sync::Arc<std::sync::atomic::AtomicBool>,
     stats: triple_buffer::Input<super::NetworkStats<SRCW, SWCR>>,
 }
-
-
-
 
 impl<SRCW: crate::Message + 'static, SWCR: crate::Message + 'static> Proxy<SRCW, SWCR> {
     pub fn start_new(
@@ -52,22 +48,18 @@ impl<SRCW: crate::Message + 'static, SWCR: crate::Message + 'static> Proxy<SRCW,
 
         let thread_handle = std::thread::spawn(move || proxy.run());
 
-        ProxyController {
-            stats: stats_out,
-            channel: main_channel,
-            running,
-            connected,
-            thread_handle,
-        }
+        ProxyController::new(stats_out, main_channel, running, connected, thread_handle)
     }
 
-    fn try_connect(&mut self) -> Result<(), ProxyError>{
+    fn try_connect(&mut self) -> Result<(), ProxyError> {
         trace!("Trying to reconnect");
         match std::net::TcpStream::connect(self.cfg.addr) {
             Ok(stream) => {
                 if let Err(e) = stream.set_nonblocking(true) {
                     error!("Could not set the created stream to non-blocking: {e}");
-                    return Err(ProxyError::Config(format!("Could not set stream to non-blocking due to: {e}")));
+                    return Err(ProxyError::Config(format!(
+                        "Could not set stream to non-blocking due to: {e}"
+                    )));
                 }
                 self.socket_opt = Some(crate::Socket::new(stream));
                 self.set_connected(true);
@@ -106,8 +98,8 @@ impl<SRCW: crate::Message + 'static, SWCR: crate::Message + 'static> Proxy<SRCW,
         }
     }
 
-    fn handle_error(&mut self, error: ProxyError){
-        match error{
+    fn handle_error(&mut self, error: ProxyError) {
+        match error {
             ProxyError::Config(e) => {
                 warn!("{e}");
                 self.set_running(false);
@@ -124,21 +116,20 @@ impl<SRCW: crate::Message + 'static, SWCR: crate::Message + 'static> Proxy<SRCW,
                 error!("{e}");
                 if self.cfg.auto_reconnect {
                     self.reset_connection();
-                }else{
-                    self.set_running(false);   
+                } else {
+                    self.set_running(false);
                 }
             }
             ProxyError::SocketRecv(e) => {
                 error!("{e}");
                 if self.cfg.auto_reconnect {
                     self.reset_connection();
-                }else{
-                    self.set_running(false);   
+                } else {
+                    self.set_running(false);
                 }
             }
             ProxyError::Disconnected => {}
         }
-
     }
 
     fn run(mut self) {
@@ -147,7 +138,7 @@ impl<SRCW: crate::Message + 'static, SWCR: crate::Message + 'static> Proxy<SRCW,
             .build_with_target_rate(self.cfg.run_tps as f64);
 
         if self.socket_opt.is_none() {
-            if let Err(e) = self.try_connect(){
+            if let Err(e) = self.try_connect() {
                 self.handle_error(e)
             }
         }
@@ -157,14 +148,13 @@ impl<SRCW: crate::Message + 'static, SWCR: crate::Message + 'static> Proxy<SRCW,
 
             let mut stats = self.stats.read().clone();
 
-            let Some(socket) = &mut self.socket_opt else{
-                if self.cfg.auto_reconnect{
-                    if let Err(e) = self.try_connect(){
+            let Some(socket) = &mut self.socket_opt else {
+                if self.cfg.auto_reconnect {
+                    if let Err(e) = self.try_connect() {
                         self.handle_error(e);
                     }
                     continue;
-                }
-                else{
+                } else {
                     break;
                 }
             };
@@ -182,7 +172,6 @@ impl<SRCW: crate::Message + 'static, SWCR: crate::Message + 'static> Proxy<SRCW,
                 self.handle_error(e);
                 continue;
             }
-
 
             self.stats.write(stats);
 
@@ -210,11 +199,11 @@ impl<SRCW: crate::Message + 'static, SWCR: crate::Message + 'static> Proxy<SRCW,
         &mut self,
         stats: &mut super::NetworkStats<SRCW, SWCR>,
     ) -> Result<(), ProxyError> {
-        let Some(socket) = &mut self.socket_opt else{
+        let Some(socket) = &mut self.socket_opt else {
             return Err(ProxyError::Disconnected);
         };
 
-        match self.channel.try_recv(){
+        match self.channel.try_recv() {
             Ok(local_msg) => {
                 stats.on_msg_send(&local_msg);
                 match socket.send(local_msg) {
@@ -226,17 +215,15 @@ impl<SRCW: crate::Message + 'static, SWCR: crate::Message + 'static> Proxy<SRCW,
                         error!(
                             "Proxy encountered an error while forwarding a message to the server: {e:?}"
                         );
-                        return Err(e).map_err(|e| ProxyError::SocketSend(format!("{e:?}")))?
+                        return Err(e).map_err(|e| ProxyError::SocketSend(format!("{e:?}")))?;
                     }
                 }
-            },
-            Err(e) => {
-                match e{
-                    std::sync::mpsc::TryRecvError::Empty => (),
-                    std::sync::mpsc::TryRecvError::Disconnected => {
-                        error!("Proxy encountered an error while listening local channel: {e:?}");
-                        return Err(ProxyError::ChannelRecv(e.to_string()))
-                    },
+            }
+            Err(e) => match e {
+                std::sync::mpsc::TryRecvError::Empty => (),
+                std::sync::mpsc::TryRecvError::Disconnected => {
+                    error!("Proxy encountered an error while listening local channel: {e:?}");
+                    return Err(ProxyError::ChannelRecv(e.to_string()));
                 }
             },
         }
@@ -249,7 +236,7 @@ impl<SRCW: crate::Message + 'static, SWCR: crate::Message + 'static> Proxy<SRCW,
         &mut self,
         stats: &mut super::NetworkStats<SRCW, SWCR>,
     ) -> Result<(), ProxyError> {
-        let Some(socket) = &mut self.socket_opt else{
+        let Some(socket) = &mut self.socket_opt else {
             return Err(ProxyError::Disconnected);
         };
 
@@ -282,13 +269,10 @@ impl<SRCW: crate::Message + 'static, SWCR: crate::Message + 'static> Proxy<SRCW,
                             warn!("socket {addr} disconnected", addr = self.cfg.addr);
                         }
                     } else {
-                        error!(
-                            "Error while listening socket {}: {e}",
-                            socket.remote_addr()
-                        );
+                        error!("Error while listening socket {}: {e}", socket.remote_addr());
                     }
                     self.reset_connection();
-                    return Err(ProxyError::SocketRecv(e.to_string()))
+                    return Err(ProxyError::SocketRecv(e.to_string()));
                 }
             }
         }

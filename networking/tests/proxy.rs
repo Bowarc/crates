@@ -44,16 +44,15 @@ fn proxy() {
         one for the connection, the other to check if the proxy is running
     */
     // Generics: What you recv, what you send
-    let proxy_output: networking::proxy::ProxyOutput<Message, Message> =
+    let proxy_controller: networking::proxy::ProxyController<Message, Message> =
         networking::Proxy::start_new(proxy_cfg, None);
 
-    proxy_output
-        .channel
+    proxy_controller
         .send(Message::Text(String::from("Hi")))
         .unwrap();
 
     // Blocking
-    match proxy_output.channel.recv().unwrap() {
+    match proxy_controller.recv().unwrap() {
         networking::proxy::ProxyMessage::Forward(_msg) => {
             // Direct message from the remote
         }
@@ -66,5 +65,5 @@ fn proxy() {
     }
 
     // Non-blocking
-    let _server_msg_res = proxy_output.channel.try_recv();
+    let _server_msg_res = proxy_controller.try_recv();
 }

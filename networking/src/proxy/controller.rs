@@ -26,6 +26,13 @@ impl<R: crate::Message, W: crate::Message> ProxyController<R, W> {
     pub fn send(&self, msg: W) -> Result<(), std::sync::mpsc::SendError<W>> {
         self.channel.send(msg)
     }
+    pub fn recv(&self) -> Result<super::ProxyMessage<R>, std::sync::mpsc::RecvError> {
+        self.channel.recv()
+    }
+    pub fn try_recv(&self) -> Result<super::ProxyMessage<R>, std::sync::mpsc::TryRecvError>{
+        self.channel.try_recv()
+    }
+
 
     pub fn is_running(&self) -> bool {
         self.running.load(std::sync::atomic::Ordering::Relaxed)
