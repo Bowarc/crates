@@ -1,3 +1,14 @@
+mod config;
+mod message;
+mod error;
+mod controller;
+
+
+pub use config::ProxyConfig;
+pub use message::ProxyMessage;
+pub use error::ProxyError;
+pub use controller::ProxyController;
+
 // as args, do i say that Read is the local or distant
 // Socket Read Channel Write
 // Socket Write Channel Read
@@ -10,55 +21,14 @@ pub struct Proxy<SRCW: crate::Message, SWCR: crate::Message> {
     stats: triple_buffer::Input<super::NetworkStats<SRCW, SWCR>>,
 }
 
-#[derive(Copy, Clone, Debug)]
-pub struct ProxyConfig {
-    pub addr: std::net::SocketAddr,
-    pub run_tps: u64,
-    pub stat_cfg: crate::stats::StatConfig,
-    // https://github.com/Bowarc/Crates/issues/8
-    pub keep_msg_while_disconnected: bool,
-    pub auto_reconnect: bool,
-}
 
-pub struct ProxyOutput<SRCW: crate::Message, SWCR: crate::Message> {
-    pub stats: triple_buffer::Output<super::NetworkStats<SRCW, SWCR>>,
-    pub channel: threading::Channel<ProxyMessage<SRCW>, SWCR>,
-    pub running: std::sync::Arc<std::sync::atomic::AtomicBool>,
-    pub connected: std::sync::Arc<std::sync::atomic::AtomicBool>,
-    pub thread_handle: std::thread::JoinHandle<()>,
-}
 
-#[derive(PartialEq, Debug)]
-pub enum ProxyMessage<T: crate::Message> {
-    Forward(T),
-    ConnectionResetError,
-    Exit,
-}
-
-#[derive(thiserror::Error, Debug, PartialEq)]
-pub enum ProxyError {
-    #[error("Config error: {0}")]
-    Config(String),
-
-    #[error("{0}")]
-    ChannelSend(String),
-    #[error("{0}")]
-    ChannelRecv(String),
-    
-    #[error("{0}")]
-    SocketSend(String),
-    #[error("{0}")]
-    SocketRecv(String),
-
-    #[error("Proxy is disconnected")]
-    Disconnected,
-}
 
 impl<SRCW: crate::Message + 'static, SWCR: crate::Message + 'static> Proxy<SRCW, SWCR> {
     pub fn start_new(
         cfg: ProxyConfig,
         stream_opt: Option<std::net::TcpStream>,
-    ) -> ProxyOutput<SRCW, SWCR> {
+    ) -> ProxyController<SRCW, SWCR> {
         let (proxy_channel, main_channel) =
             threading::Channel::<ProxyMessage<SRCW>, SWCR>::new_pair();
 
@@ -82,7 +52,7 @@ impl<SRCW: crate::Message + 'static, SWCR: crate::Message + 'static> Proxy<SRCW,
 
         let thread_handle = std::thread::spawn(move || proxy.run());
 
-        ProxyOutput {
+        ProxyController {
             stats: stats_out,
             channel: main_channel,
             running,
