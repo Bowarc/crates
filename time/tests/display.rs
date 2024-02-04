@@ -11,15 +11,17 @@ fn display() {
     let one_hour = Duration::from_secs(3661);
     let one_day = Duration::from_secs(90000);
 
-    println!("{}", time::format(one_nano));
-    println!("{}", time::format(one_micro));
-    println!("{}", time::format(one_milli));
-    println!("{}", time::format(one_sec));
-    println!("{}", time::format(one_minute));
-    println!("{}", time::format(one_hour));
-    println!("{}", time::format(one_day));
+    println!("{}", time::format(one_nano, -1));
+    println!("{}", time::format(one_micro, -1));
+    println!("{}", time::format(one_milli, -1));
+    println!("{}", time::format(one_sec, -1));
+    println!("{}", time::format(one_minute, -1));
+    println!("{}", time::format(one_hour, -1));
+    println!("{}", time::format(one_day, -1));
 
 
-    println!("{}", time::format(Duration::from_secs(3661)));
-    println!("{}", time::format(Duration::from_secs(31536001)));
+    println!("{}", time::format(Duration::from_secs(3661), -1));
+    println!("{}", time::format(Duration::from_secs(31546321), -1));
+
+
 }

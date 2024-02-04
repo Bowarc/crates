@@ -114,12 +114,23 @@ impl Stopwatch {
 
 impl std::fmt::Display for Stopwatch {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", format(self.read()))
+        write!(f, "{}", format(self.read(), -1))
     }
 }
 
-pub fn format(duration: std::time::Duration) -> String {
-
+/// The precision is the number of units you want to see displayed
+/// For example:
+///     Example:
+///         time elapsed was 2h 14m 3s 169ms rtc..
+///
+///         format(1) would give 2h
+///         format(2) would give 2h 14m
+///
+///         Etcc and ofc it wouldn't show 0h or 0m
+///
+///     Specify -1 to display every units (where the value isn't 0)
+///
+pub fn format(duration: std::time::Duration, mut prec: i8) -> String {
     const NANOS_IN_MICROSECOND: f64 = 1_000.0;
     const NANOS_IN_MILLISECOND: f64 = 1_000_000.0;
     const NANOS_IN_SECOND: f64 = 1_000_000_000.0;
@@ -138,55 +149,63 @@ pub fn format(duration: std::time::Duration) -> String {
     let mut remaining_nanos = total_nanos;
     let mut formatted_duration = String::new();
 
-    if remaining_nanos >= NANOS_IN_YEAR {
+    if remaining_nanos >= NANOS_IN_YEAR && prec != 0 {
+        prec -= 1;
         let years = remaining_nanos / NANOS_IN_YEAR;
         formatted_duration.push_str(&format!("{:.0}y ", years));
         remaining_nanos %= NANOS_IN_YEAR;
     }
 
-    if remaining_nanos >= NANOS_IN_WEEK {
+    if remaining_nanos >= NANOS_IN_WEEK && prec != 0 {
+        prec -= 1;
         let weeks = remaining_nanos / NANOS_IN_WEEK;
         formatted_duration.push_str(&format!("{:.0}w ", weeks));
         remaining_nanos %= NANOS_IN_WEEK;
     }
 
-    if remaining_nanos >= NANOS_IN_DAY {
+    if remaining_nanos >= NANOS_IN_DAY && prec != 0 {
+        prec -= 1;
         let days = remaining_nanos / NANOS_IN_DAY;
         formatted_duration.push_str(&format!("{:.0}d ", days));
         remaining_nanos %= NANOS_IN_DAY;
     }
 
-    if remaining_nanos >= NANOS_IN_HOUR {
+    if remaining_nanos >= NANOS_IN_HOUR && prec != 0 {
+        prec -= 1;
         let hours = remaining_nanos / NANOS_IN_HOUR;
         formatted_duration.push_str(&format!("{:.0}h ", hours));
         remaining_nanos %= NANOS_IN_HOUR;
     }
 
-    if remaining_nanos >= NANOS_IN_MINUTE {
+    if remaining_nanos >= NANOS_IN_MINUTE && prec != 0 {
+        prec -= 1;
         let minutes = remaining_nanos / NANOS_IN_MINUTE;
         formatted_duration.push_str(&format!("{:.0}m ", minutes));
         remaining_nanos %= NANOS_IN_MINUTE;
     }
 
-    if remaining_nanos >= NANOS_IN_SECOND {
+    if remaining_nanos >= NANOS_IN_SECOND && prec != 0 {
+        prec -= 1;
         let seconds = remaining_nanos / NANOS_IN_SECOND;
         formatted_duration.push_str(&format!("{:.0}s ", seconds));
         remaining_nanos %= NANOS_IN_SECOND;
     }
 
-    if remaining_nanos >= NANOS_IN_MILLISECOND{
+    if remaining_nanos >= NANOS_IN_MILLISECOND && prec != 0 {
+        prec -= 1;
         let milis = remaining_nanos / NANOS_IN_MILLISECOND;
         formatted_duration.push_str(&format!("{:.0}ms ", milis));
         remaining_nanos %= NANOS_IN_MILLISECOND;
     }
 
-    if remaining_nanos >= NANOS_IN_MICROSECOND{
+    if remaining_nanos >= NANOS_IN_MICROSECOND && prec != 0 {
+        prec -= 1;
         let micro = remaining_nanos / NANOS_IN_MICROSECOND;
         formatted_duration.push_str(&format!("{:.0}µs ", micro));
         remaining_nanos %= NANOS_IN_MICROSECOND;
     }
 
-    if remaining_nanos > 0.0 {
+    if remaining_nanos > 0.0 && prec != 0 {
         formatted_duration.push_str(&format!("{:.0}ns", remaining_nanos));
     }
 
@@ -225,7 +244,7 @@ pub fn timeit_mut<F: FnMut() -> T, T>(mut f: F) -> (T, std::time::Duration) {
     //!     std::thread::sleep(std::time::Duration::from_secs(2));
     //!     *x += 1
     //! }
-    //! 
+    //!
     //! let mut y = 5;
     //! let (output, duration) = timeit_mut( || my_mut_function(&mut y) );
     //! ```
@@ -235,7 +254,9 @@ pub fn timeit_mut<F: FnMut() -> T, T>(mut f: F) -> (T, std::time::Duration) {
     (f(), start.elapsed())
 }
 
-pub async fn timeit_async<F: std::future::Future<Output = T>, T>(f: impl FnOnce() -> F) -> (T, std::time::Duration) {
+pub async fn timeit_async<F: std::future::Future<Output = T>, T>(
+    f: impl FnOnce() -> F,
+) -> (T, std::time::Duration) {
     //! Used to time the execution of a function with mutable parameters
     //! # Example
     //! ```
