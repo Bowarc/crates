@@ -1,0 +1,19 @@
+[package]
+name = "maths"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[features]
+default = []
+ggez = ["dep:ggez"]
+serde = ["dep:serde"]
+geo = ["dep:geo"]
+
+[dependencies]
+log = "0.4.20"
+ggez = {version = "0.9.3", optional = true}
+serde = { version = "1.0.197", features = ["derive"], optional = true }
+geo = {version = "0.25.0",  optional = true}
+
