@@ -121,13 +121,13 @@ impl From<f64> for DTDelay {
 ///
 /// std::thread::sleep(std::time::Duration::from_secs_f32(1.5));
 /// 
-/// println!("{}", stopwatch.read()) // 1.5s
+/// println!("{}", time::format(stopwatch.read(), 1)); // 1.5s
 /// 
 /// stopwatch.stop();
 /// 
 /// std::thread::sleep(std::time::Duration::from_secs(1));
 /// 
-/// println!("{}", stopwatch.read()) // 1.5s
+/// println!("{}", time::format(stopwatch.read(), 1)); // 1.5s
 /// ```
 
 #[derive(Debug, Clone)]
