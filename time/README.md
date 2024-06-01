@@ -1,4 +1,4 @@
-## Tools to work with time in gamedev
+## Tools to work with time (Mostly for gamedev)
 
 #### Use example:
 
