@@ -75,7 +75,7 @@ fn generate_file_name(record: &log::Record) -> String {
 
 fn generate_message(message: &std::fmt::Arguments, record: &log::Record, color: bool) -> String {
     format!(
-        "╭[{time} {level} {file_path}:{line_nbr}]\n╰❯{message}",
+        "[{time} {level} {file_path}:{line_nbr}]\n{message}",
         time = chrono::Local::now().format("%H:%M:%S%.3f"),
         level = if color {
             format!("{}", colorise(record.level().to_string(), record.level()))
@@ -137,11 +137,11 @@ pub fn init(config: LoggerConfig, log_file_opt: Option<&str>) {
 pub fn test() {
     use log::{debug, error, info, trace, warn};
 
-    // trace!("This is Trace level"); // target: "custom_target",
-    // debug!("This is Debug level");
-    // info!("This is Info level");
-    // warn!("This is Warn level");
-    // error!("This is Error level");
+    trace!("This is Trace level"); // target: "custom_target",
+    debug!("This is Debug level");
+    info!("This is Info level\nThis is Info level Multiline\nThis is Info level Multiline\nThis is Info level Multiline\nThis is Info level Multiline\n");
+    warn!("This is Warn level");
+    error!("This is Error level");
 
     for i in 0..26 {
         trace!("loading: {}%, very verbose debbuging information", 4 * i);
