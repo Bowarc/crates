@@ -75,7 +75,7 @@ fn generate_file_name(record: &log::Record) -> String {
 
 fn generate_message(message: &std::fmt::Arguments, record: &log::Record, color: bool) -> String {
     format!(
-        "[{time} {level} {file_path}:{line_nbr}]\n{message}",
+        "[{time} {level} {file_path}:{line_nbr}] {message}",
         time = chrono::Local::now().format("%H:%M:%S%.3f"),
         level = if color {
             format!("{}", colorise(record.level().to_string(), record.level()))
