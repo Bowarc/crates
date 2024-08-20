@@ -77,6 +77,7 @@ impl<R: crate::Message, W: crate::Message> Socket<R, W> {
 
         Ok(header)
     }
+
     pub fn try_recv(&mut self) -> Result<(Header, R), SocketError> {
         let header = match self.last_header {
             Some(header) => {
@@ -139,6 +140,26 @@ impl<R: crate::Message, W: crate::Message> Socket<R, W> {
         trace!("Deserializing message.. Done, {message:?}");
 
         Ok(message)
+    }
+
+    pub fn recv(&mut self, check_delay: std::time::Duration) -> Result<(Header, R), SocketError> {
+        loop {
+            match self.try_recv() {
+                Ok(t) => return Ok(t),
+                Err(e) => {
+                    // lol
+                    if !if let crate::socket::SocketError::StreamRead(ref io_e) = e {
+                        io_e.kind() == std::io::ErrorKind::WouldBlock
+                    } else {
+                        false
+                    } {
+                        return Err(e);
+                    }
+                }
+            }
+
+            spin_sleep::sleep(check_delay);
+        }
     }
 
     pub fn local_addr(&self) -> std::net::SocketAddr {
