@@ -1,19 +1,23 @@
 #[test]
-fn all() {
+fn get() {
     // 0, 1, 2, 3, 4, 5, 6, 7, 8, 9
     let _ = random::get(0, 10);
 
     // 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
     let _ = random::get_inc(0, 10);
+}
 
+#[test]
+fn pick(){
     let v = vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
     // random item in v
-    let _v_item = random::pick(&v);
+    let item = random::pick(&v);
 
-    // 50% chance true, 50% false
-    let _coin = random::conflip();
+    assert!(v.contains(item))
+}
 
-    // Random string for given len
-    let r = random::str(50);
-    println!("{r}") // kpk6PmI3pak70NMSWZLMO0DGAT5i0WzNtZWNbkNEPZbDbxlWDC
+#[test]
+fn _str(){
+    assert_eq!(random::str(50).len(), 50)
 }
