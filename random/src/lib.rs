@@ -1,5 +1,8 @@
-use rand::seq::SliceRandom;
-use rand::Rng;
+use {
+    rand::{Rng,seq::SliceRandom},
+};
+
+pub mod weighted_bag;
 
 /// Samples a number from a range (So nbr => min && nbr <max)
 pub fn get<T>(x: T, y: T) -> T
@@ -50,9 +53,9 @@ pub fn str(len: usize) -> String {
 }
 
 /// only crashes when sampling from empty vec
-pub fn pick<T: Clone + std::fmt::Debug>(entry: &[T]) -> T {
+pub fn pick<T: std::fmt::Debug>(entry: &[T]) -> &T {
     if entry.is_empty() {
         panic!("Can't sample empty vec: {entry:?}")
     }
-    entry.choose(&mut rand::thread_rng()).unwrap().clone()
+    entry.choose(&mut rand::thread_rng()).unwrap()
 }
