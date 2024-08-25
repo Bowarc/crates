@@ -8,12 +8,10 @@ edition = "2021"
 [features]
 default = []
 serde = ["dep:serde"]
-bagU8 = []
-bagU16 = []
-bagU32 = []
-bagU64 = []
-bagU128 = []
+bag = ["dep:num-traits"]
 
 [dependencies]
 rand = "0.8.5"
-serde = { version = "1.0.197", features = ["derive"], optional = true }
+log.workspace = true
+serde = { workspace = true, features = ["derive"], optional = true }
+num-traits = { version = "0.2.19", optional = true }
