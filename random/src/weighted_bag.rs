@@ -1,17 +1,9 @@
 mod entry;
-use entry::WeightedBagEntry;
+mod weight;
 
-pub trait Weight:
-    rand::distributions::uniform::SampleUniform
-    + num_traits::Unsigned
-    + num_traits::Zero
-    + num_traits::One
-    + std::fmt::Debug
-    + std::ops::AddAssign
-    + Clone
-    + PartialOrd
-{
-}
+use entry::WeightedBagEntry;
+use weight::Weight;
+
 
 #[cfg_attr(
     feature = "serde",
