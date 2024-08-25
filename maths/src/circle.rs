@@ -1,17 +1,19 @@
-use crate::Point;
-
-
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
+#[cfg_attr(
+    feature = "serde",
+    derive(serde::DeserializeOwned, serde::Serialize),
+    serde(from = "((f64, f64), f64))")
+)]
 pub struct Circle {
-    pub center: Point,
+    pub center: super::Point,
     pub radius: f64,
 }
 
 impl Circle {
-    pub fn new(center: Point, radius: f64) -> Self {
+    pub fn new(center: super::Point, radius: f64) -> Self {
         Self { center, radius }
     }
-    pub fn center(&self) -> Point {
+    pub fn center(&self) -> super::Point {
         self.center
     }
 }
@@ -19,5 +21,14 @@ impl Circle {
 impl std::fmt::Display for Circle {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "{self:?}")
+    }
+}
+
+impl From<((f64, f64), f64)> for Circle {
+    fn from(value: ((f64, f64), f64)) -> Self {
+        Circle {
+            center: super::Point::from(value.0),
+            radius: value.1,
+        }
     }
 }

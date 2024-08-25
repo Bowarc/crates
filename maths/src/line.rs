@@ -1,4 +1,9 @@
 #[derive(Clone, Copy, Debug, PartialEq)]
+#[cfg_attr(
+    feature = "serde",
+    derive(serde::DeserializeOwned, serde::Serialize),
+    serde(from = "((f64, f64),(f64, f64))")
+)]
 pub struct Line(pub super::Point, pub super::Point);
 impl Line {
     pub fn new(p0: super::Point, p1: super::Point) -> Self {
@@ -35,6 +40,12 @@ impl Line {
 pub fn rotate(mut line: Line, angle: f64) -> Line {
     line.rotate(angle);
     line
+}
+
+impl From<((f64, f64), (f64, f64))> for Line {
+    fn from(value: ((f64, f64), (f64, f64))) -> Self {
+        Line(super::Point::from(value.0), super::Point::from(value.1))
+    }
 }
 
 impl std::fmt::Display for Line {

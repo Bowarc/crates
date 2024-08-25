@@ -1,7 +1,9 @@
-
 #[derive(Default, Debug, Clone, Copy, PartialEq, PartialOrd)]
-#[cfg_attr(feature = "serde", derive(serde::Deserialize))]
-#[cfg_attr(feature = "serde", serde(from = "(f64, f64)"))]
+#[cfg_attr(
+    feature = "serde",
+    derive(serde::DeserializeOwned, serde::Serialize),
+    serde(from = "(f64, f64)")
+)]
 pub struct Point {
     pub x: f64,
     pub y: f64,
