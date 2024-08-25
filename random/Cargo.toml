@@ -8,6 +8,11 @@ edition = "2021"
 [features]
 default = []
 serde = ["dep:serde"]
+bagU8 = []
+bagU16 = []
+bagU32 = []
+bagU64 = []
+bagU128 = []
 
 [dependencies]
 rand = "0.8.5"

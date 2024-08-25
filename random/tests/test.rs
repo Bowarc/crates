@@ -21,3 +21,4 @@ fn pick(){
 fn _str(){
     assert_eq!(random::str(50).len(), 50)
 }
+

@@ -1,17 +1,16 @@
-use {
-    rand::{Rng,seq::SliceRandom},
-};
+use rand::{Rng,seq::SliceRandom};
 
-pub mod weighted_bag;
+#[cfg(any(feature = "bagU8", feature = "bagU16", feature = "bagU32", feature = "bagU64", feature = "bagU128"))]
+mod weighted_bag;
+#[cfg(any(feature = "bagU8", feature = "bagU16", feature = "bagU32", feature = "bagU64", feature = "bagU128"))]
+pub use weighted_bag::WeightedBag;
 
 /// Samples a number from a range (So nbr => min && nbr <max)
 pub fn get<T>(x: T, y: T) -> T
 where
-    // R: rand::distributions::uniform::SampleRange<T> + std::fmt::Debug,
     T: rand::distributions::uniform::SampleUniform
-        + std::cmp::PartialEq
-        + std::fmt::Debug
-        + std::cmp::PartialOrd,
+        + std::cmp::PartialEq + std::cmp::PartialOrd,
+        // + std::fmt::Debug
 {
     if x == y {
         // warn!("Can't sample empty range: {:?}", x..y);
@@ -27,7 +26,7 @@ where
     // R: rand::distributions::uniform::SampleRange<T> + std::fmt::Debug,
     T: rand::distributions::uniform::SampleUniform
         + std::cmp::PartialEq
-        + std::fmt::Debug
+        // + std::fmt::Debug
         + std::cmp::PartialOrd,
 {
     if x == y {
