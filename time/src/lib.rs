@@ -26,9 +26,13 @@
 /// println!("Time since ended: {}", delay.time_since_ended()); // Time since ended: 1.0
 /// ```
 
-#[derive(derivative::Derivative, Default, Copy, Debug, Clone, serde::Deserialize)]
+#[cfg_attr(
+    feature = "serde",
+    derive(serde::Deserialize, serde::Serialize),
+    serde(from = "Vec<(f64)>")
+)]
+#[derive(derivative::Derivative, Default, Copy, Debug, Clone)]
 #[derivative(PartialEq)]
-#[serde(from = "f64")]
 pub struct DTDelay {
     starting_timeout_s: f64, // Initial timeout value in seconds
     #[derivative(PartialEq = "ignore")]
