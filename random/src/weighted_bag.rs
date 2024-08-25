@@ -15,7 +15,7 @@ pub trait Weight:
 
 #[cfg_attr(
     feature = "serde",
-    derive(serde::Deserialize, serde::Serialize),
+    derive(serde::DeserializeOwned, serde::Serialize),
     serde(from = "Vec<(T, i32)>")
 )]
 pub struct WeightedBag<T, W> {
