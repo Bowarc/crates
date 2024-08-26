@@ -10,7 +10,7 @@ pub struct Header {
 }
 
 // I don't like how streams work so i'll make a simple socket-like, packet-based struct wrapper
-pub struct Socket<R, W> {
+pub struct Socket<R: crate::Message, W: crate::Message> {
     stream: std::net::TcpStream,
     read_type: std::marker::PhantomData<R>,
     write_type: std::marker::PhantomData<W>,
@@ -29,6 +29,9 @@ pub enum SocketError {
     StreamWrite(std::io::Error),
     #[error("Error when reading the stream: {0}")]
     StreamRead(std::io::Error),
+
+    #[error("The other side has closed the communication")]
+    Exited,
     // #[error("Error when peeking into stream: {0}")]
     // StreamPeek(std::io::Error),
     // #[error("Still waiting for more data")]
@@ -95,6 +98,10 @@ impl<R: crate::Message, W: crate::Message> Socket<R, W> {
         let message = self.try_get::<R>(header.size)?;
 
         self.last_header = None;
+
+        if message.is_exit(){
+            return Err(SocketError::Exited);
+        }
 
         Ok((header, message))
     }
@@ -171,5 +178,13 @@ impl<R: crate::Message, W: crate::Message> Socket<R, W> {
     }
     pub fn shutdown(&self) {
         self.stream.shutdown(std::net::Shutdown::Both).unwrap();
+    }
+}
+
+impl<R: crate::Message, W: crate::Message> std::ops::Drop for Socket<R, W>{
+    fn drop(&mut self) {
+        // Don't care about the error, half the time it's gonna be disconnected anyway
+        let _ = self.send(W::default_exit());
+
     }
 }
