@@ -5,6 +5,7 @@ mod message;
 
 pub use error::ProxyError;
 pub use message::ProxyMessage;
+pub use controller::ProxyController;
 
 // as args, do i say that Read is the local or distant
 // Socket Read Channel Write
