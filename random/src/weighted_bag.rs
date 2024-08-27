@@ -98,16 +98,17 @@ impl<T: std::fmt::Debug, W: std::fmt::Debug> std::fmt::Debug for WeightedBag<T, 
 #[test]
 fn test() {
     fn inner_test<T: num_traits::NumCast + Weight>() -> Option<()> {
-        let mut bag = super::WeightedBag::<&str, T>::default();
+        let bag = super::WeightedBag::<&str, T>::from(vec![
+            ("Hi", T::from(2)?),      // 0..=1
+            ("Hellow", T::from(1)?),  //  =2
+            ("Bonjour", T::from(4)?), //  3..=6
+            ("Holà", T::from(4)?),    //  7..=10
+            ("こんにちは", T::from(3)?), // 11..=13
+            ("你好", T::from(10)?),   // 14..=23
+            ("Olá", T::from(7)?),    // 24..=30
+            ("Hej", T::from(5000)?), // 31..=5030
+        ]);
 
-        bag.add_entry("Hi", T::from(2)?); // 0..=1
-        bag.add_entry("Hellow", T::from(1)?); //  =2
-        bag.add_entry("Bonjour", T::from(4)?); //  3..=6
-        bag.add_entry("Holà", T::from(4)?); //  7..=10
-        bag.add_entry("こんにちは", T::from(3)?); // 11..=13
-        bag.add_entry("你好", T::from(10)?); // 14..=23
-        bag.add_entry("Olá", T::from(7)?); // 24..=30
-        bag.add_entry("Hej", T::from(5000)?); // 31..=5030
 
         dbg!(&bag);
 
