@@ -3,9 +3,10 @@ mod controller;
 mod error;
 mod message;
 
+pub use config::ProxyConfig;
+pub use controller::ProxyController;
 pub use error::ProxyError;
 pub use message::ProxyMessage;
-pub use controller::ProxyController;
 
 // as args, do i say that Read is the local or distant
 // Socket Read Channel Write
@@ -26,7 +27,6 @@ impl<SRCW: crate::Message + 'static, SWCR: crate::Message + 'static> Proxy<SRCW,
     ) -> controller::ProxyController<SRCW, SWCR> {
         use {
             crate::{NetworkStats, Socket},
-            message::ProxyMessage,
             std::{
                 sync::{atomic::AtomicBool, Arc},
                 thread,
