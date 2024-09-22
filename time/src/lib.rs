@@ -63,8 +63,8 @@ impl DTDelay {
     /// * `offset` - The offset to subtract from the timeout value.
     pub fn restart_custom_timeline(&mut self, offset: f64) {
         *self = Self {
-            starting_timeout_s: self.timeout_s,
-            timeout_s: self.timeout_s - offset,
+            starting_timeout_s: self.starting_timeout_s,
+            timeout_s: self.starting_timeout_s - offset,
         }
     }
 
