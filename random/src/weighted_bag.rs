@@ -2,7 +2,7 @@ mod entry;
 mod weight;
 
 use entry::WeightedBagEntry;
-use weight::Weight;
+pub use weight::Weight;
 
 #[cfg_attr(
     feature = "serde",
