@@ -116,21 +116,21 @@ impl std::convert::From<Point> for ggez::mint::Point2<f32> {
     }
 }
 #[cfg(feature = "ggez")]
+impl std::convert::From<Point> for ggez::mint::Vector2<f32> {
+    fn from(o: Point) -> Self {
+        ggez::mint::Vector2 {
+            x: o.x as f32,
+            y: o.y as f32,
+        }
+    }
+}
+#[cfg(feature = "ggez")]
 impl std::convert::From<Point> for ggez::mint::Point3<f32> {
     fn from(o: Point) -> Self {
         ggez::mint::Point3 {
             x: o.x as f32,
             y: o.y as f32,
             z: 0.,
-        }
-    }
-}
-#[cfg(feature = "ggez")]
-impl std::convert::From<Point> for ggez::mint::Vector2<f32> {
-    fn from(o: Point) -> Self {
-        ggez::mint::Vector2 {
-            x: o.x as f32,
-            y: o.y as f32,
         }
     }
 }
@@ -156,8 +156,8 @@ impl std::convert::From<ggez::mint::Point2<f32>> for Point {
     }
 }
 #[cfg(feature = "ggez")]
-impl std::convert::From<ggez::mint::Point3<f32>> for Point {
-    fn from(o: ggez::mint::Point3<f32>) -> Self {
+impl std::convert::From<ggez::mint::Vector2<f32>> for Point {
+    fn from(o: ggez::mint::Vector2<f32>) -> Self {
         Point {
             x: o.x as f64,
             y: o.y as f64,
@@ -165,8 +165,8 @@ impl std::convert::From<ggez::mint::Point3<f32>> for Point {
     }
 }
 #[cfg(feature = "ggez")]
-impl std::convert::From<ggez::mint::Vector2<f32>> for Point {
-    fn from(o: ggez::mint::Vector2<f32>) -> Self {
+impl std::convert::From<ggez::mint::Point3<f32>> for Point {
+    fn from(o: ggez::mint::Point3<f32>) -> Self {
         Point {
             x: o.x as f64,
             y: o.y as f64,
