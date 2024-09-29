@@ -29,12 +29,13 @@
 #[cfg_attr(
     feature = "serde",
     derive(serde::Deserialize, serde::Serialize),
-    serde(from = "Vec<(f64)>")
+    serde(from = "f64")
 )]
 #[derive(derivative::Derivative, Default, Copy, Debug, Clone)]
 #[derivative(PartialEq)]
 pub struct DTDelay {
     starting_timeout_s: f64, // Initial timeout value in seconds
+
     #[derivative(PartialEq = "ignore")]
     // Ignore this field when comparing two DTDelay instances for equality
     // because it is too precise to reliably compare.
@@ -124,13 +125,13 @@ impl From<f64> for DTDelay {
 /// let mut stopwatch = Stopwatch::start_new();
 ///
 /// std::thread::sleep(std::time::Duration::from_secs_f32(1.5));
-/// 
+///
 /// println!("{}", time::format(stopwatch.read(), 1)); // 1.5s
-/// 
+///
 /// stopwatch.stop();
-/// 
+///
 /// std::thread::sleep(std::time::Duration::from_secs(1));
-/// 
+///
 /// println!("{}", time::format(stopwatch.read(), 1)); // 1.5s
 /// ```
 
