@@ -4,13 +4,12 @@ mod weight;
 use entry::WeightedBagEntry;
 use weight::Weight;
 
-
 #[cfg_attr(
     feature = "serde",
-    derive(serde::DeserializeOwned, serde::Serialize),
-    serde(from = "Vec<(T, i32)>")
+    derive(serde::Serialize, serde::Deserialize),
+    serde(from = "Vec<(T, W)>")
 )]
-pub struct WeightedBag<T, W> {
+pub struct WeightedBag<T, W: Weight> {
     entries: Vec<WeightedBagEntry<T, W>>,
     weight: Option<W>,
 }
@@ -35,7 +34,7 @@ impl<T, W: Weight> WeightedBag<T, W> {
         })
     }
 
-    // For tests
+    // I needed this part to be it's own method for tests, and since it's inlined, i don't see it being any different than not
     #[inline]
     pub(crate) fn get(&self, r: W) -> Option<&T> {
         self.entries.iter().find(|e| e.weight >= r).map(|e| &**e)
@@ -68,7 +67,7 @@ impl<T, W: Weight> From<Vec<(T, W)>> for WeightedBag<T, W> {
     }
 }
 
-impl<T, W> Default for WeightedBag<T, W> {
+impl<T, W: Weight> Default for WeightedBag<T, W> {
     fn default() -> Self {
         Self {
             entries: Vec::new(),
@@ -77,7 +76,7 @@ impl<T, W> Default for WeightedBag<T, W> {
     }
 }
 
-impl<T: Clone, W: Clone> Clone for WeightedBag<T, W> {
+impl<T: Clone, W: Weight> Clone for WeightedBag<T, W> {
     fn clone(&self) -> Self {
         Self {
             entries: self.entries.clone(),
@@ -86,7 +85,7 @@ impl<T: Clone, W: Clone> Clone for WeightedBag<T, W> {
     }
 }
 
-impl<T: std::fmt::Debug, W: std::fmt::Debug> std::fmt::Debug for WeightedBag<T, W> {
+impl<T: std::fmt::Debug, W: Weight + std::fmt::Debug> std::fmt::Debug for WeightedBag<T, W> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         f.debug_struct("Bag")
             .field("entries", &self.entries)
@@ -99,16 +98,15 @@ impl<T: std::fmt::Debug, W: std::fmt::Debug> std::fmt::Debug for WeightedBag<T, 
 fn test() {
     fn inner_test<T: num_traits::NumCast + Weight>() -> Option<()> {
         let bag = super::WeightedBag::<&str, T>::from(vec![
-            ("Hi", T::from(2)?),      // 0..=1
-            ("Hellow", T::from(1)?),  //  =2
-            ("Bonjour", T::from(4)?), //  3..=6
-            ("Holà", T::from(4)?),    //  7..=10
+            ("Hi", T::from(2)?),         // 0..=1
+            ("Hellow", T::from(1)?),     //  =2
+            ("Bonjour", T::from(4)?),    //  3..=6
+            ("Holà", T::from(4)?),       //  7..=10
             ("こんにちは", T::from(3)?), // 11..=13
-            ("你好", T::from(10)?),   // 14..=23
-            ("Olá", T::from(7)?),    // 24..=30
-            ("Hej", T::from(5000)?), // 31..=5030
+            ("你好", T::from(10)?),      // 14..=23
+            ("Olá", T::from(7)?),        // 24..=30
+            ("Hej", T::from(5000)?),     // 31..=5030
         ]);
-
 
         dbg!(&bag);
 
