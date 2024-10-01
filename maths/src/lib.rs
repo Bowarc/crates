@@ -29,7 +29,7 @@ pub fn clamp<T: std::cmp::PartialOrd>(nbr: T, min: T, max: T) -> T {
     }
 }
 
-pub fn get_distance(pt1: Point, pt2: Point) -> f64 {
+pub fn get_distance(pt1: &Point, pt2: &Point) -> f64 {
     ((pt1.x - pt2.x).powf(2.) + (pt1.y - pt2.y).powf(2.)).sqrt()
 }
 
