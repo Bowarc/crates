@@ -11,7 +11,7 @@ pub enum CollideDirection {
     Right,
 }
 
-pub fn rect_rect_no_r(r1: super::Rect, r2: super::Rect) -> bool {
+pub fn rect_rect_no_r(r1: &super::Rect, r2: &super::Rect) -> bool {
     // fix this, .topleft should be replaced as points[0]
 
     // let is_collison =
@@ -24,17 +24,17 @@ pub fn rect_rect_no_r(r1: super::Rect, r2: super::Rect) -> bool {
         && r1.height() + r1.aa_topleft().y > r2.aa_topleft().y
 }
 
-pub fn rect_rect(r1: super::Rect, r2: super::Rect) -> bool {
+pub fn rect_rect(r1: &super::Rect, r2: &super::Rect) -> bool {
     // check if r1 is inside r2
     for point in r1.r_points() {
-        if point_rect(point, r2) {
+        if point_rect(&point, r2) {
             return true;
         }
     }
 
     // check if r2 is inside r1
     for point in r2.r_points() {
-        if point_rect(point, r1) {
+        if point_rect(&point, r1) {
             return true;
         }
     }
@@ -42,7 +42,7 @@ pub fn rect_rect(r1: super::Rect, r2: super::Rect) -> bool {
     // This is for cases like crosses
     for r1l in r1.r_lines() {
         for r2l in r2.r_lines() {
-            if line_line(r1l, r2l) {
+            if line_line(&r1l, &r2l) {
                 return true;
             }
         }
@@ -54,7 +54,7 @@ pub fn rect_rect(r1: super::Rect, r2: super::Rect) -> bool {
     false
 }
 
-// pub fn rect_circle(r: super::Rect, c: super::Circle) -> bool {
+// pub fn rect_circle(r: &super::Rect, c: super::Circle) -> bool {
 //     let lines = r.aa_lines();
 //     for line in lines {
 //         if line_circle(line, c) {
@@ -64,26 +64,26 @@ pub fn rect_rect(r1: super::Rect, r2: super::Rect) -> bool {
 //     false
 // }
 
-pub fn rect_line(r: super::Rect, l: super::Line) -> bool {
+pub fn rect_line(r: &super::Rect, l: &super::Line) -> bool {
     let lines = r.aa_lines();
     for line in lines {
-        if line_line(line, l) {
+        if line_line(&line, l) {
             return true;
         }
     }
     false
 }
 
-pub fn line_line(l1: super::Line, l2: super::Line) -> bool {
-    fn ccw(a: super::Point, b: super::Point, c: super::Point) -> bool {
+pub fn line_line(l1: &super::Line, l2: &super::Line) -> bool {
+    fn ccw(a: &super::Point, b: &super::Point, c: &super::Point) -> bool {
         (c.y - a.y) * (b.x - a.x) > (b.y - a.y) * (c.x - a.x)
     }
-    fn intersect(a: super::Point, b: super::Point, c: super::Point, d: super::Point) -> bool {
+    fn intersect(a: &super::Point, b: &super::Point, c: &super::Point, d: &super::Point) -> bool {
         ccw(a, c, d) != ccw(b, c, d) && ccw(a, b, c) != ccw(a, b, d)
     }
-    intersect(l1.0, l1.1, l2.0, l2.1)
+    intersect(&l1.0, &l1.1, &l2.0, &l2.1)
 }
-pub fn line_closest_pt(line: super::Line, point: super::Point) -> super::Point {
+pub fn line_closest_pt(line: &super::Line, point: &super::Point) -> super::Point {
     let (x1, y1) = (line.0.x, line.0.y);
     let (x2, y2) = (line.1.x, line.1.y);
     let (x3, y3) = (point.x, point.y);
@@ -93,11 +93,11 @@ pub fn line_closest_pt(line: super::Line, point: super::Point) -> super::Point {
 
     let mut new_point = super::Point::new(x1 + a * dx, y1 + a * dy);
 
-    let line_length = super::get_distance(line.0, line.1);
+    let line_length = super::get_distance(&line.0, &line.1);
 
-    let dist_to_a = super::get_distance(new_point, line.0);
+    let dist_to_a = super::get_distance(&new_point, &line.0);
 
-    let dist_to_b = super::get_distance(new_point, line.1);
+    let dist_to_b = super::get_distance(&new_point, &line.1);
 
     if dist_to_a > line_length && dist_to_a > dist_to_b {
         new_point = line.1;
@@ -109,7 +109,7 @@ pub fn line_closest_pt(line: super::Line, point: super::Point) -> super::Point {
     new_point
 }
 
-// pub fn line_circle(line: super::Line, circle: super::Circle) -> bool {
+// pub fn line_circle(line: &super::Line, circle: super::Circle) -> bool {
 //     let closest_point = line_closest_pt(line, circle.center);
 
 //     let collision_result = point_in_circle(closest_point, circle);
@@ -137,7 +137,7 @@ pub fn line_closest_pt(line: super::Line, point: super::Point) -> super::Point {
 //     distance < circle1.radius + circle2.radius
 // }
 
-pub fn point_rect(point: super::Point, rect: super::Rect) -> bool {
+pub fn point_rect(point: &super::Point, rect: &super::Rect) -> bool {
     // let x1 = rect.topleft().x;
     // let y1 = rect.topleft().y;
     // let x2 = x1 + rect.width();
@@ -153,7 +153,7 @@ pub fn point_rect(point: super::Point, rect: super::Rect) -> bool {
     // so, as in Vupa the center of rotation of a rect is it's center, just rotate the point by -rect.angle()
     // with rect.center() as 'origin'/'anchor'
     // Visualisation: https://i.stack.imgur.com/vRmRH.png (Image from Heckel's response in the link above)
-    let rotated_point = super::Point::new_rotated(rect.center(), point, -rect.rotation());
+    let rotated_point = super::Point::new_rotated(rect.center(), *point, -rect.rotation());
     // super::line::rotate(super::Line::new(rect.center(), point), -rect.rotation()).1;
 
     // and then, just check the rotated point with the non-rotated rect
@@ -166,7 +166,7 @@ pub fn point_rect(point: super::Point, rect: super::Rect) -> bool {
     // false
 }
 
-// pub fn point_in_circle(point: super::Point, circle: super::Circle) -> bool {
+// pub fn point_in_circle(point: &super::Point, circle: super::Circle) -> bool {
 //     //CollisionResult
 //     let dist_point_circle_center = super::get_distance(circle.center, point);
 
