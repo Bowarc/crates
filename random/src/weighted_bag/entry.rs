@@ -23,7 +23,7 @@ impl<T, W> std::ops::Deref for WeightedBagEntry<T, W> {
 
 impl<T: std::fmt::Debug, W: std::fmt::Debug> std::fmt::Debug for WeightedBagEntry<T, W> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        f.debug_struct("Bag")
+        f.debug_struct("WeightedBagEntry")
             .field("inner", &self.inner)
             .field("weight", &self.weight)
             .finish()

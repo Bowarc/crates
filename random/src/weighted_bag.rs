@@ -87,7 +87,7 @@ impl<T: Clone, W: Weight> Clone for WeightedBag<T, W> {
 
 impl<T: std::fmt::Debug, W: Weight + std::fmt::Debug> std::fmt::Debug for WeightedBag<T, W> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        f.debug_struct("Bag")
+        f.debug_struct("WeightedBag")
             .field("entries", &self.entries)
             .field("total_weight", &self.weight)
             .finish()
@@ -108,7 +108,7 @@ fn test() {
             ("Hej", T::from(5000)?),     // 31..=5030
         ]);
 
-        dbg!(&bag);
+        // dbg!(&bag);
 
         assert_eq!(bag.get(T::zero()), Some(&"Hi"));
         assert_eq!(bag.get(T::one()), Some(&"Hi"));

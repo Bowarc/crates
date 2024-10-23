@@ -1,13 +1,71 @@
 #[macro_use]
 extern crate log;
 
-use rand::{seq::SliceRandom, Rng};
-
 #[cfg(feature = "bag")]
 pub mod weighted_bag;
 
 #[cfg(feature = "bag")]
 pub use weighted_bag::WeightedBag;
+
+struct Storage {
+    seed: u64,
+    rng: rand::rngs::SmallRng,
+}
+
+std::thread_local! {
+    static STORAGE: std::cell::RefCell<Storage> = std::cell::RefCell::new({
+    use {
+        rand::{rngs::SmallRng, Rng, SeedableRng as _},
+    };
+
+    // This is ugly, but i need the seed
+    let seed = SmallRng::from_entropy().gen::<u64>();
+
+    debug!("Initializing with seed: {seed}");
+
+    Storage {
+        seed,
+        // This is the fastest way to make multithreading i found
+        rng: SmallRng::seed_from_u64(seed),
+    }
+
+
+    })
+}
+
+// static STORAGE: std::sync::LazyLock<Storage> = std::sync::LazyLock::new(|| {
+//     use {
+//         rand::{rngs::SmallRng, Rng, SeedableRng as _},
+//         std::sync::atomic::AtomicU64,
+//     };
+
+//     // This is ugly, but i need the seed
+//     let seed = SmallRng::from_entropy().gen::<u64>();
+
+//     debug!("Initializing with seed: {seed}");
+
+//     Storage {
+//         seed: AtomicU64::new(seed),
+//         // This is the fastest way to make multithreading i found
+//         rng: parking_lot::Mutex::new(SmallRng::seed_from_u64(seed)),
+//     }
+// });
+
+/// Sets the seed for the future queries
+/// This is mostly usefull to make deterministic tests for games, or even bug hunts
+pub fn set_seed(seed: u64) {
+    use rand::{rngs::SmallRng, SeedableRng};
+    STORAGE.with_borrow_mut(|storage| {
+        storage.seed = seed;
+
+        storage.rng = SmallRng::seed_from_u64(seed);
+    });
+}
+
+/// Retrieves the seed
+pub fn seed() -> u64 {
+    STORAGE.with_borrow(|storage| storage.seed)
+}
 
 /// Samples a number from a range (So nbr => min && nbr <max)
 pub fn get<T>(x: T, y: T) -> T
@@ -17,12 +75,14 @@ where
         + std::cmp::PartialOrd
         + std::fmt::Debug,
 {
+    use rand::Rng as _;
+
     if x == y {
-        warn!("Can't sample empty range: {x:?} !");
+        // warn!("Can't sample empty range: {x:?} !");
         return x;
     };
 
-    rand::thread_rng().gen_range(x..y)
+    STORAGE.with_borrow_mut(|storage| storage.rng.gen_range(x..y))
 }
 
 /// Samples a number from a range (So nbr => min && nbr =<max)
@@ -34,32 +94,37 @@ where
         + std::fmt::Debug
         + std::cmp::PartialOrd,
 {
+    use rand::Rng as _;
+
     if x == y {
-        warn!("Can't sample empty range: {x:?} !");
+        // warn!("Can't sample empty range: {x:?} !");
         return x;
     };
 
-    rand::thread_rng().gen_range(x..=y)
+    STORAGE.with_borrow_mut(|storage| storage.rng.gen_range(x..=y))
 }
 
+/// Technically not realistic as it cannot land on it's side :)
 pub fn conflip() -> bool {
-    rand::thread_rng().gen_bool(0.5)
+    use rand::Rng as _;
+
+    STORAGE.with_borrow_mut(|storage| storage.rng.gen_bool(0.5))
 }
 
 /// Samples a String with a given lengh
 pub fn str(len: usize) -> String {
-    use rand::distributions::Alphanumeric; // 0.8
-    rand::thread_rng()
-        .sample_iter(&Alphanumeric)
-        .take(len)
-        .map(char::from)
-        .collect()
+    use rand::distributions::{Alphanumeric, DistString};
+
+    STORAGE.with_borrow_mut(|storage| Alphanumeric.sample_string(&mut storage.rng, len))
 }
 
 /// only crashes when sampling from empty vec
-pub fn pick<T: std::fmt::Debug>(entry: &[T]) -> &T {
-    if entry.is_empty() {
-        panic!("Can't sample empty vec: {entry:?}")
+pub fn pick<T: std::fmt::Debug>(input: &[T]) -> &T {
+    use rand::seq::SliceRandom;
+
+    if input.is_empty() {
+        panic!("Can't sample empty slice ")
     }
-    entry.choose(&mut rand::thread_rng()).unwrap()
+
+    STORAGE.with_borrow_mut(|storage| input.choose(&mut storage.rng).unwrap())
 }
