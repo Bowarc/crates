@@ -11,7 +11,7 @@ pub struct Rect {
 }
 
 impl Rect {
-    //About caching, idk if i'll re-implement it now that i found the maths to make things cleanly
+    //About caching, idk if i'll re-implement it now that i found the math to make things cleanly
 
     pub fn new(
         topleft: impl Into<crate::Point>,

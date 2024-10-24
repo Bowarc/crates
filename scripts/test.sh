@@ -1,6 +1,6 @@
 cargo test -p enum_variant_name
 cargo test -p logger
-cargo test -p maths
+cargo test -p math
 cargo test -p mem
 cargo test -p networking
 cargo test -p random

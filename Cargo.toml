@@ -1,18 +1,16 @@
 [workspace]
 resolver = "1"
 members = [
-    "enum_variant_name",
-    "logger",
-    "mem",
-    "networking",
-    "random",
-    "threading",
-    "time",
-    "maths",
+  "enum_variant_name",
+  "logger",
+  "mem",
+  "networking",
+  "random",
+  "threading",
+  "time",
+  "math",
 ]
 
 [workspace.dependencies]
 serde = "1.0.197"
 log = "0.4.20"
-
-
