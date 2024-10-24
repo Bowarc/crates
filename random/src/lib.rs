@@ -33,24 +33,6 @@ std::thread_local! {
     })
 }
 
-// static STORAGE: std::sync::LazyLock<Storage> = std::sync::LazyLock::new(|| {
-//     use {
-//         rand::{rngs::SmallRng, Rng, SeedableRng as _},
-//         std::sync::atomic::AtomicU64,
-//     };
-
-//     // This is ugly, but i need the seed
-//     let seed = SmallRng::from_entropy().gen::<u64>();
-
-//     debug!("Initializing with seed: {seed}");
-
-//     Storage {
-//         seed: AtomicU64::new(seed),
-//         // This is the fastest way to make multithreading i found
-//         rng: parking_lot::Mutex::new(SmallRng::seed_from_u64(seed)),
-//     }
-// });
-
 /// Sets the seed for the future queries
 /// This is mostly usefull to make deterministic tests for games, or even bug hunts
 pub fn set_seed(seed: u64) {
