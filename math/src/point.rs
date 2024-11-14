@@ -1,3 +1,5 @@
+use std::ffi::FromBytesWithNulError;
+
 #[derive(Default, Debug, Clone, Copy, PartialEq, PartialOrd)]
 #[cfg_attr(
     feature = "serde",
@@ -238,6 +240,8 @@ impl std::convert::From<f64> for Point {
         Point::new(other, other)
     }
 }
+
+// +
 impl std::ops::Add<Self> for Point {
     type Output = Self;
 
@@ -250,12 +254,11 @@ impl std::ops::Add<Self> for Point {
 }
 impl std::ops::AddAssign for Point {
     fn add_assign(&mut self, other: Self) {
-        *self = Self {
-            x: self.x + other.x,
-            y: self.y + other.y,
-        };
+        self.x += other.x;
+        self.y += other.y;
     }
 }
+
 impl std::ops::Add<f64> for Point {
     type Output = Self;
 
@@ -266,6 +269,8 @@ impl std::ops::Add<f64> for Point {
         }
     }
 }
+
+// -
 impl std::ops::Sub<Self> for Point {
     type Output = Self;
 
@@ -276,12 +281,11 @@ impl std::ops::Sub<Self> for Point {
         }
     }
 }
+
 impl std::ops::SubAssign for Point {
     fn sub_assign(&mut self, other: Self) {
-        *self = Self {
-            x: self.x - other.x,
-            y: self.y - other.y,
-        };
+        self.x -= other.x;
+        self.y -= other.y;
     }
 }
 impl std::ops::Sub<f64> for Point {
@@ -294,6 +298,8 @@ impl std::ops::Sub<f64> for Point {
         }
     }
 }
+
+// /
 impl std::ops::Div<Point> for Point {
     type Output = Self;
 
@@ -304,6 +310,13 @@ impl std::ops::Div<Point> for Point {
         }
     }
 }
+impl std::ops::DivAssign for Point {
+    fn div_assign(&mut self, other: Self) {
+        self.x /= other.x;
+        self.y /= other.y;
+    }
+}
+
 impl std::ops::Div<f64> for Point {
     type Output = Self;
 
@@ -314,6 +327,8 @@ impl std::ops::Div<f64> for Point {
         }
     }
 }
+
+// *
 impl std::ops::Mul<Point> for Point {
     type Output = Self;
 
@@ -324,6 +339,13 @@ impl std::ops::Mul<Point> for Point {
         }
     }
 }
+impl std::ops::MulAssign for Point {
+    fn mul_assign(&mut self, other: Self) {
+        self.x *= other.x;
+        self.y *= other.y;
+    }
+}
+
 impl std::ops::Mul<f64> for Point {
     type Output = Self;
 
@@ -334,6 +356,8 @@ impl std::ops::Mul<f64> for Point {
         }
     }
 }
+
+// -Self
 impl std::ops::Neg for Point {
     type Output = Self;
     fn neg(self) -> Self {
