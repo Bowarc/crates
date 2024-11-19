@@ -10,15 +10,15 @@ impl Worker {
             .spawn(move || {
                 loop {
                     let Ok(message) = receiver.recv() else {
-                        println!("[{id}] Could not receive any command, Exiting");
+                        trace!("[{id}] Could not receive any command, Exiting");
                         break;
                     };
 
                     match message {
                         super::command::Command::Job(f) => {
-                            println!("[{id}] got a job; executing.");
+                            trace!("[{id}] got a job; executing.");
                             f.call_box();
-                            println!("[{id}] Job's done.");
+                            trace!("[{id}] Job's done.");
                         }
                         super::command::Command::Exit => break,
                     }

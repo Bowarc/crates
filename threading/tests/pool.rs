@@ -1,6 +1,6 @@
 #[test]
 fn thread_pool() {
-    use threading::pool::ThreadPool;
+    use threading::ThreadPool;
 
     let pool = ThreadPool::new(7);
 
@@ -41,9 +41,22 @@ fn thread_pool() {
             })
             .collect::<Vec<_>>(),
     );
-    for future in futures.into_iter() {
-        future.wait().unwrap();
-        let y = future.output().unwrap();
-        println!("{y}");
+
+    while !futures.is_empty() {
+        let mut index = 0;
+        while index < futures.len() {
+            let f = futures.get(index).unwrap();
+            if f.is_done() {
+                let output = futures.remove(index).output().unwrap();
+
+                println!("Output: {output}");
+                assert_eq!(pool.flying_tasks_count(), h1.flying_tasks_count());
+                assert_eq!(pool.flying_tasks_count(), h2.flying_tasks_count());
+                assert_eq!(pool.flying_tasks_count(), h3.flying_tasks_count());
+                println!("Flying tasks count: {}", pool.flying_tasks_count(),);
+            } else {
+                index += 1;
+            }
+        }
     }
 }
