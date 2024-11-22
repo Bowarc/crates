@@ -1,4 +1,5 @@
-## Bundle of std::sync::mpsc::Sender and std::sync::mpsc::Receiver with some added methods 
+## Threadpool and channels
+
 
 #### Use example:
 
@@ -6,7 +7,44 @@ cargo.toml
 ```toml
 [dependencies]
 threading = {git = "https://github.com/Bowarc/Crates.git", package = "threading"}
-``` 
+```
+
+main.rs
+```rust
+// ThreadPool s can be cloned and even shared across thread
+// They are just handles 
+// When you drop all the handles, the remote threads will close
+let pool = ThreadPool::new(7);
+
+let x = 0;
+// This will send the closure to a thread to be ran as soon as possible, non-blocking for the main thread.
+let future = pool.run(move || {
+    std::thread::sleep(std::time::Duration::from_secs(3));
+    x + 1
+});
+
+// The future received from pool.run is used to get the output of the closure.
+
+// use 
+future.wait();
+// To block the current thread until the closure has returned
+
+// You can also check if the closure has already returned with
+future.is_done();
+// Which will return false if it's not yet picked up by a thread or still running
+
+// To get the output of the future, use
+future.output();
+// Which gives you a result, where it's guaranteed to be Ok() if the closure has finished
+// Quick note, i havn't done anything for closure panics yet.
+
+
+
+```
+
+ 
+#### Bundle of std::sync::mpsc::Sender and std::sync::mpsc::Receiver with some added methods 
+
 main.rs
 ```rust
 #[derive(PartialEq)]
