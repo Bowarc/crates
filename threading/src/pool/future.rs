@@ -1,9 +1,3 @@
-pub enum FutureUpdate<T> {
-    Started,
-    Done(T),
-    Panicked,
-}
-
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum FutureState {
     Flying,  // Not yet picked up by a worker
@@ -13,99 +7,81 @@ pub enum FutureState {
 }
 
 pub struct Future<T> {
-    // data: std::sync::Mutex<Option<T>>,
-    // state: std::sync::Mutex<FutureState>,
+    data: parking_lot::Mutex<Option<T>>,
+    state: parking_lot::Mutex<FutureState>,
 
-    // flag: std::sync::atomic::AtomicBool,
-    // condvar: std::sync::Condvar,
-    output: Option<T>,
-    _sender: crossbeam::channel::Sender<FutureUpdate<T>>,
-    receiver: crossbeam::channel::Receiver<FutureUpdate<T>>,
-    state: FutureState,
+    condvar: parking_lot::Condvar,
 }
 
-// #[derive(Debug, Clone, Copy)]
-// pub enum FutureError {
-//     NoData,
-//     NotDone,
-//     LockError,
-// }
-
 impl<T> Future<T> {
-    pub fn new(
-        sender: crossbeam::channel::Sender<FutureUpdate<T>>,
-        receiver: crossbeam::channel::Receiver<FutureUpdate<T>>,
-    ) -> Self {
-        Self {
-            output: None::<T>,
-
-            // I HATE this,
-            // I need to store the sender here too else the comunication will close when the worker is done
-            // and the Future won't be able to read the stream :c
-            _sender: sender,
-            receiver,
-            state: FutureState::Flying,
+    // It's actually required to not get &mut self, as we store it in an Arc and we only do Atomics operations
+    #[inline]
+    fn set_state(&self, new_state: FutureState) {
+        {
+            let mut guard = self.state.lock();
+            *guard = new_state;
         }
+
+        let _has_a_thread_been_woken_up = self.condvar.notify_one();
     }
 
-    fn recv_one(&self, blocking: bool) -> Option<FutureUpdate<T>> {
-        use crossbeam::channel::{RecvError, TryRecvError};
-        if blocking {
-            match self.receiver.recv() {
-                Ok(msg) => Some(msg),
-                Err(RecvError) => None,
-            }
-        } else {
-            match self.receiver.try_recv() {
-                Ok(msg) => Some(msg),
-                Err(TryRecvError::Empty) => None,
-                Err(TryRecvError::Disconnected) => panic!("Could not read the receiver"),
-            }
-        }
+    pub fn set_started(&self) {
+        self.set_state(FutureState::Started);
     }
 
-    fn update(&mut self, blocking: bool) {
-        // loop {
-        let Some(msg) = self.recv_one(blocking) else {
-            return;
+    pub fn set_done(&self, output: T) {
+        let mut data_lock = self.data.lock();
+        self.set_state(FutureState::Done);
+        *data_lock = Some(output);
+    }
+
+    pub fn set_panicked(&self) {
+        self.set_state(FutureState::Panicked)
+    }
+
+    pub fn is_done(&self) -> bool {
+        let Some(guard) = self.data.try_lock() else {
+            return false;
         };
 
-        match msg {
-            FutureUpdate::Started => {
-                println!("Received: Stated");
-                self.state = FutureState::Started
-            }
-            FutureUpdate::Done(output) => {
-                println!("Received: Done");
-                self.output = Some(output);
-                self.state = FutureState::Done;
-            }
-            FutureUpdate::Panicked => {
-                println!("Received: Panicked");
-                self.state = FutureState::Panicked
-            }
+        guard.is_some()
+    }
+
+    pub fn state(&self) -> FutureState {
+        *self.state.lock()
+    }
+
+    pub fn wait(&self) {
+        let state = self.state();
+        if matches!(state, FutureState::Done) || matches!(state, FutureState::Panicked) {
+            return;
         }
-        // }
+
+        self.condvar.wait_while(&mut self.state.lock(), |state| {
+            *state != FutureState::Done && *state != FutureState::Panicked
+        });
+
+        self.wait();
     }
 
-    pub fn state(&mut self) -> FutureState {
-        self.update(false);
-        self.state
-    }
-
-    pub fn is_done(&mut self) -> bool {
-        self.update(false);
-        matches!(self.state, FutureState::Done) || matches!(self.state, FutureState::Panicked)
-    }
-
-    pub fn wait(&mut self) {
-        while self.state != FutureState::Done && self.state != FutureState::Panicked {
-            self.update(true);
-            println!("Update done");
+    pub fn output(&self) -> Option<T> {
+        if *self.state.lock() != FutureState::Done {
+            return None;
         }
-    }
 
-    pub fn output(self) -> Option<T> {
-        self.output
+        self.data.try_lock()?.take()
+    }
+}
+
+impl<T> Default for Future<T> {
+    fn default() -> Self {
+        use parking_lot::{Condvar, Mutex};
+
+        Self {
+            data: Mutex::new(None::<T>),
+            state: Mutex::new(FutureState::Flying),
+
+            condvar: Condvar::new(),
+        }
     }
 }

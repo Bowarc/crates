@@ -57,30 +57,37 @@ impl ThreadPool {
     >(
         &self,
         task: F,
-    ) -> Future<O> {
+    ) -> std::sync::Arc<Future<O>> {
+        use std::sync::Arc;
+
         self.flying_tasks_count
             .fetch_add(1, std::sync::atomic::Ordering::AcqRel);
 
         // It will at most, be 2 message sent by the worker thread.
         // One setting the default State 'Flying' to 'Started'
         // One Setting the 'Started' state to 'Done'(with the output data) or 'Panicked' if the closure panicked
-        let (data_sender, data_receiver) = crossbeam::channel::bounded(2);
+        // let (data_sender, data_receiver) = crossbeam::channel::bounded(2);
 
-        let future = Future::<O>::new(data_sender.clone(), data_receiver);
+        let future = Arc::new(Future::<O>::default());
+
+        let cloned_future = future.clone();
 
         let ftc = self.flying_tasks_count.clone();
 
         self.sender
             .send(Box::new(move |worker_id| {
-                data_sender.send(future::FutureUpdate::Started).unwrap();
+                // data_sender.send(future::FutureUpdate::Started).unwrap();
+                future.set_started();
                 match std::panic::catch_unwind(task) {
                     Ok(output) => {
-                        data_sender
-                            .send(future::FutureUpdate::Done(output))
-                            .unwrap();
+                        future.set_done(output);
+                        // data_sender
+                        //     .send(future::FutureUpdate::Done(output))
+                        //     .unwrap();
                     }
                     Err(payload) => {
-                        data_sender.send(future::FutureUpdate::Panicked).unwrap();
+                        future.set_panicked();
+                        // data_sender.send(future::FutureUpdate::Panicked).unwrap();
 
                         error!("Worker {worker_id} panicked, dropping the payload");
 
@@ -119,7 +126,7 @@ impl ThreadPool {
             }))
             .unwrap();
 
-        future
+        cloned_future
     }
 
     pub fn flying_tasks_count(&self) -> u16 {

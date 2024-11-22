@@ -5,13 +5,13 @@ fn thread_pool() {
 
     let pool = ThreadPool::new(1);
 
-    let mut future_1 = pool.run(|| 5);
+    let future_1 = pool.run(|| 5);
 
-    let mut future_2 = pool.run(|| String::from("Hi"));
+    let future_2 = pool.run(|| String::from("Hi"));
 
-    let mut future_3 = pool.run(|| (String::from("Hi"), false));
+    let future_3 = pool.run(|| (String::from("Hi"), false));
 
-    let mut future_4 = pool.run(|| panic!("Hi"));
+    let future_4 = pool.run(|| panic!("Hi"));
 
     future_1.wait();
     assert_eq!(future_1.state(), FutureState::Done);
