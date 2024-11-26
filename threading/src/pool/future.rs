@@ -40,11 +40,8 @@ impl<T> Future<T> {
     }
 
     pub fn is_done(&self) -> bool {
-        let Some(guard) = self.data.try_lock() else {
-            return false;
-        };
-
-        guard.is_some()
+        let state = self.state();
+        matches!(state, FutureState::Done) || matches!(state, FutureState::Panicked)
     }
 
     pub fn state(&self) -> FutureState {
