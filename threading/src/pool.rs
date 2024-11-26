@@ -17,7 +17,6 @@ mod future;
 mod task;
 mod worker;
 
-use future::Future;
 use task::Task;
 // use worker::Worker;
 
