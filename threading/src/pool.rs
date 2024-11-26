@@ -52,10 +52,7 @@ impl ThreadPool {
         }
     }
 
-    pub fn run<
-        O: Clone + Send + 'static,
-        F: FnOnce() -> O + Send + std::panic::UnwindSafe + 'static,
-    >(
+    pub fn run<O: Send + 'static, F: FnOnce() -> O + Send + std::panic::UnwindSafe + 'static>(
         &self,
         task: F,
     ) -> ArcFuture<O> {

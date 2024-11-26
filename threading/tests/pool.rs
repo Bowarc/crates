@@ -29,3 +29,29 @@ fn thread_pool() {
     assert_eq!(future_4.state(), FutureState::Panicked);
     assert_eq!(future_4.output(), None);
 }
+
+#[test]
+fn not_clone() {
+    use std::cell::RefCell;
+    use threading::pool::FutureState;
+    use threading::ThreadPool;
+    #[derive(Debug, PartialEq)]
+    struct NotClone {
+        data: RefCell<i32>,
+    }
+
+    let pool = ThreadPool::new(1);
+
+    let f = pool.run(move || NotClone {
+        data: RefCell::new(1),
+    });
+
+    f.wait();
+    assert_eq!(f.state(), FutureState::Done);
+    assert_eq!(
+        f.output(),
+        Some(NotClone {
+            data: RefCell::new(1)
+        })
+    );
+}
