@@ -21,7 +21,7 @@ use future::Future;
 use task::Task;
 // use worker::Worker;
 
-pub use future::FutureState;
+pub use future::{Future, FutureState};
 
 #[derive(Clone)]
 pub struct ThreadPool {
