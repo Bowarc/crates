@@ -58,7 +58,7 @@ impl ThreadPool {
     >(
         &self,
         task: F,
-    ) -> std::sync::Arc<Future<O>> {
+    ) -> ArcFuture<O> {
         use std::sync::Arc;
 
         self.flying_tasks_count
