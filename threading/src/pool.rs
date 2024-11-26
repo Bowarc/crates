@@ -22,6 +22,8 @@ use task::Task;
 
 pub use future::{Future, FutureState};
 
+pub type ArcFuture<T> = std::sync::Arc<Future<T>>;
+
 #[derive(Clone)]
 pub struct ThreadPool {
     // workers: std::sync::Arc<Vec<Worker>>,
