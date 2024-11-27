@@ -21,7 +21,7 @@ std::thread_local! {
     // This is ugly, but i need the seed
     let seed = SmallRng::from_entropy().gen::<u64>();
 
-    debug!("Initializing with seed: {seed}");
+    trace!("Initializing with seed: {seed}");
 
     Storage {
         seed,
