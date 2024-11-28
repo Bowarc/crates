@@ -1,11 +1,18 @@
+/// Represents the possible states of a `Future`.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum FutureState {
-    Flying,  // Not yet picked up by a worker
-    Started, // Currently being executed by a worker
+    /// The future has not yet been picked up by a worker.
+    Flying,
+    /// The future is currently being executed by a worker.
+    Started,
+    /// The future has completed execution successfully.
     Done,
+    /// The future has encountered a panic during execution.
     Panicked,
 }
-
+/// A representation of a value that may not be available yet, allowing for asynchronous computation.
+///
+/// The `Future` struct provides a way to track the state of a computation and retrieve its result once it is available.
 pub struct Future<T> {
     data: parking_lot::Mutex<Option<T>>,
     state: parking_lot::Mutex<FutureState>,
@@ -25,48 +32,59 @@ impl<T> Future<T> {
         let _has_a_thread_been_woken_up = self.condvar.notify_one();
     }
 
-    pub fn set_started(&self) {
+    pub(crate) fn set_started(&self) {
         self.set_state(FutureState::Started);
     }
 
-    pub fn set_done(&self, output: T) {
+    pub(crate) fn set_done(&self, output: T) {
         let mut data_lock = self.data.lock();
         self.set_state(FutureState::Done);
         *data_lock = Some(output);
     }
 
-    pub fn set_panicked(&self) {
+    pub(crate) fn set_panicked(&self) {
         self.set_state(FutureState::Panicked)
     }
 
+    /// Checks if the future has completed execution (either done or panicked).
     pub fn is_done(&self) -> bool {
         let state = self.state();
         matches!(state, FutureState::Done) || matches!(state, FutureState::Panicked)
     }
 
+    /// Retrieves the current [FutureState].
     pub fn state(&self) -> FutureState {
         *self.state.lock()
     }
 
+    /// Waits for the future to complete execution.
+    ///
+    /// This method blocks the current thread until the future is either done or panicked.
     pub fn wait(&self) {
-        let state = self.state();
-        if matches!(state, FutureState::Done) || matches!(state, FutureState::Panicked) {
+        let mut state_lock = self.state.lock();
+        if matches!(*state_lock, FutureState::Done) || matches!(*state_lock, FutureState::Panicked)
+        {
             return;
         }
 
-        self.condvar.wait_while(&mut self.state.lock(), |state| {
+        self.condvar.wait_while(&mut state_lock, |state| {
             *state != FutureState::Done && *state != FutureState::Panicked
         });
+
+        drop(state_lock);
 
         self.wait();
     }
 
-    pub fn output(&self) -> Option<T> {
-        if *self.state.lock() != FutureState::Done {
-            return None;
-        }
+    /// Retrieves the output of the future.
+    ///
+    /// # Panics if
+    /// - The task has panicked
+    /// - The task has not yet returned
+    pub fn output(&self) -> T {
+        assert_eq!(self.state(), FutureState::Done, "Blah");
 
-        self.data.try_lock()?.take()
+        self.data.lock().take().unwrap()
     }
 }
 

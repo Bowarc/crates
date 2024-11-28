@@ -49,7 +49,9 @@ pub fn seed() -> u64 {
     STORAGE.with_borrow(|storage| storage.seed)
 }
 
-/// Samples a number from a range (So nbr => min && nbr <max)
+/// Samples a number from the range x..y
+///
+/// x has to be smaller than or equal to y
 pub fn get<T>(x: T, y: T) -> T
 where
     T: rand::distributions::uniform::SampleUniform
@@ -67,7 +69,9 @@ where
     STORAGE.with_borrow_mut(|storage| storage.rng.gen_range(x..y))
 }
 
-/// Samples a number from a range (So nbr => min && nbr =<max)
+/// Samples a number from the range x..=y
+///
+/// x has to be smaller than or equal to y
 pub fn get_inc<T>(x: T, y: T) -> T
 where
     // R: rand::distributions::uniform::SampleRange<T> + std::fmt::Debug,
@@ -86,6 +90,8 @@ where
     STORAGE.with_borrow_mut(|storage| storage.rng.gen_range(x..=y))
 }
 
+/// Returns true 50% of the time
+///
 /// Technically not realistic as it cannot land on it's side :)
 pub fn conflip() -> bool {
     use rand::Rng as _;
@@ -93,14 +99,16 @@ pub fn conflip() -> bool {
     STORAGE.with_borrow_mut(|storage| storage.rng.gen_bool(0.5))
 }
 
-/// Samples a String with a given lengh
+/// Samples a random String with a given lengh
 pub fn str(len: usize) -> String {
     use rand::distributions::{Alphanumeric, DistString};
 
     STORAGE.with_borrow_mut(|storage| Alphanumeric.sample_string(&mut storage.rng, len))
 }
 
-/// only crashes when sampling from empty vec
+/// Select a random element from the given slice
+///
+/// Panics if the input slice is empty
 pub fn pick<T: std::fmt::Debug>(input: &[T]) -> &T {
     use rand::seq::SliceRandom;
 

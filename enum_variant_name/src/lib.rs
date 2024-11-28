@@ -2,6 +2,24 @@ use proc_macro::TokenStream;
 use quote::quote;
 use syn::{parse_macro_input, Data, DeriveInput, Error};
 
+/// A procedural macro that derives a method for enums to return the name of their variants as a string.
+///
+/// # Example
+///
+/// ```rust
+/// #[derive(VariantName)]
+/// enum MyEnum {
+///     Variant1,
+///     Variant2(()),
+///     Variant3 {
+///         _field1: (),
+///     },
+/// }
+///
+/// assert_eq!(MyEnum::Variant1.variant_name(), "Variant1");
+/// assert_eq!(MyEnum::Variant2(()).variant_name(), "Variant2");
+/// assert_eq!(MyEnum::Variant3 { _field1: () }.variant_name(), "Variant3");
+/// ```
 #[proc_macro_derive(VariantName)]
 pub fn variant_name(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);

@@ -57,7 +57,10 @@ impl DTDelay {
     }
 
     /// Restart the `DTDelay` with a custom timeline.
+    ///
     /// This is useful for better consistency over low framerate.
+    ///
+    /// Often paired with [`DTDelay::time_since_ended`]
     ///
     /// # Arguments
     ///

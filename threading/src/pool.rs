@@ -24,6 +24,10 @@ pub use future::{Future, FutureState};
 
 pub type ArcFuture<T> = std::sync::Arc<Future<T>>;
 
+/// A thread pool that manages a set of worker threads to execute tasks concurrently.
+///
+/// The `ThreadPool` allows you to submit closures to be executed in separate threads,  
+/// and provides a way to retrieve the results of those closures through [Future] objects.
 #[derive(Clone)]
 pub struct ThreadPool {
     // workers: std::sync::Arc<Vec<Worker>>,
@@ -33,6 +37,7 @@ pub struct ThreadPool {
 }
 
 impl ThreadPool {
+    /// Creates a new `ThreadPool` with the specified number of worker threads.
     pub fn new(thread_count: u16) -> Self {
         let (s, r) = crossbeam::channel::unbounded();
 
@@ -52,6 +57,13 @@ impl ThreadPool {
         }
     }
 
+    /// Submits a closure to be executed by a worker thread and returns a `Future` for the result.
+    ///
+    /// # Parameters
+    /// - `task`: The closure to be executed. It must be [`Send`], [`'static`](https://doc.rust-lang.org/stable/std/keyword.static.html), and [`panic-safe`](std::panic::UnwindSafe).
+    ///
+    /// # Returns
+    /// An [`ArcFuture<O>`] that can be used to retrieve the result of the closure once it has completed.
     pub fn run<O: Send + 'static, F: FnOnce() -> O + Send + std::panic::UnwindSafe + 'static>(
         &self,
         task: F,
@@ -127,6 +139,7 @@ impl ThreadPool {
         cloned_future
     }
 
+    /// Returns the number of not yet exectued tasks in the pool.
     pub fn flying_tasks_count(&self) -> u16 {
         self.flying_tasks_count
             .load(std::sync::atomic::Ordering::Acquire)

@@ -9,6 +9,26 @@ pub use weight::Weight;
     derive(serde::Serialize, serde::Deserialize),
     serde(from = "Vec<(T, W)>")
 )]
+
+/// A `WeightedBag` is a collection that holds entries of type `T` with associated weights of type `W`.  
+/// The weights determine the likelihood of selecting each entry when retrieving a random item from the bag.
+///
+/// # Type Parameters
+/// - `T`: The type of the entries stored in the bag.
+/// - `W`: A type that implements the [Weight] trait, representing the weight of each entry.
+///
+/// # Features
+/// This struct can derive `Serialize` and `Deserialize` traits when the `serde` feature is enabled.  
+/// It can also be constructed from a vector of tuples `Vec<(T, W)>` containing entries and their corresponding weights.
+///
+/// # Example
+/// ```
+/// let mut bag: random::WeightedBag<&str, u32> = random::WeightedBag::default();
+/// bag.add_entry("apple", 2);
+/// bag.add_entry("banana", 1);
+/// let random_fruit: Option<&&str> = bag.try_get_random();
+/// ```
+
 pub struct WeightedBag<T, W: Weight> {
     entries: Vec<WeightedBagEntry<T, W>>,
     weight: Option<W>,
@@ -16,6 +36,8 @@ pub struct WeightedBag<T, W: Weight> {
 
 impl<T, W: Weight> WeightedBag<T, W> {
     /// Adds an entry with given weight to the bag
+    ///
+    /// Panics if the weight is 0
     pub fn add_entry(&mut self, t: T, weight: W) {
         // Doesn't make sense + would break the system
         assert_ne!(weight, W::zero(), "Weightless entries are not allowed");
@@ -49,9 +71,12 @@ impl<T, W: Weight> WeightedBag<T, W> {
         self.get(super::get_inc(W::zero(), acc_weight).into())
     }
 
-    /// Panics if:
-    ///     - The bag is empty
-    ///     - You modified the entries or weight yourself somehow
+    /// Short hand for [WeightedBag::try_get_random].unwrap()
+    ///
+    /// # Panics if:
+    ///
+    /// - The bag is empty
+    #[inline]
     pub fn get_random(&self) -> &T {
         self.try_get_random().unwrap()
     }
