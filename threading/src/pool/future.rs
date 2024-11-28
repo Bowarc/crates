@@ -82,7 +82,10 @@ impl<T> Future<T> {
     /// - The task has panicked
     /// - The task has not yet returned
     pub fn output(&self) -> T {
-        assert_eq!(self.state(), FutureState::Done, "Blah");
+        assert!(
+            self.state() == FutureState::Done,
+            "Can't read the output of a task that has not completed successfully"
+        );
 
         self.data.lock().take().unwrap()
     }

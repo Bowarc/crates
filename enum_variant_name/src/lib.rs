@@ -7,7 +7,7 @@ use syn::{parse_macro_input, Data, DeriveInput, Error};
 /// # Example
 ///
 /// ```rust
-/// #[derive(VariantName)]
+/// #[derive(enum_variant_name::VariantName)]
 /// enum MyEnum {
 ///     Variant1,
 ///     Variant2(()),

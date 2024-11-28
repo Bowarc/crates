@@ -25,15 +25,18 @@ fn thread_pool() {
 }
 
 #[test]
-#[should_panic(expected = "Expected panic")]
+#[should_panic(expected = "Can't read the output of a task that has not completed successfully")]
 fn panic() {
     use threading::ThreadPool;
 
     let pool = ThreadPool::new(1);
 
-    let panicking_future = pool.run(|| panic!("Hi"));
+    let panicking_future = pool.run(|| panic!("Expected panic"));
 
-    panicking_future.wait()
+    panicking_future.wait();
+
+    // This is the call that panics
+    panicking_future.output();
 }
 
 #[test]
