@@ -1,0 +1,1 @@
+searchState.loadedDescShard("random", 0, "Returns true 50% of the time\nSamples a number from the range x..y\nSamples a number from the range x..=y\nSelect a random element from the given slice\nRetrieves the seed\nSets the seed for the future queries This is mostly …\nSamples a random String with a given lengh")

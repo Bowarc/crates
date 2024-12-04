@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["FutureState"],"struct":["Future","ThreadPool"],"type":["ArcFuture"]};

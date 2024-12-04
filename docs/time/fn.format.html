@@ -1,0 +1,48 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Formats a `std::time::Duration` into a human-readable string with specified precision."><title>format in time - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="time" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0 (eeb90cda1 2024-09-04)" data-channel="1.81.0" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../static.files/storage-118b08c4c78b968e.js"></script><script defer src="sidebar-items.js"></script><script defer src="../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc fn"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle" title="show sidebar"></button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../time/index.html">time</a><span class="version">0.1.0</span></h2></div><div class="sidebar-elems"></div></nav><div class="sidebar-resizer"></div><main><div class="width-limiter"><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1>Function <a href="index.html">time</a>::<wbr><a class="fn" href="#">format</a><button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><span class="out-of-band"><a class="src" href="../src/time/lib.rs.html#254-334">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><pre class="rust item-decl"><code>pub fn format(duration: <a class="struct" href="https://doc.rust-lang.org/1.81.0/core/time/struct.Duration.html" title="struct core::time::Duration">Duration</a>, prec: <a class="primitive" href="https://doc.rust-lang.org/1.81.0/std/primitive.i8.html">i8</a>) -&gt; <a class="struct" href="https://doc.rust-lang.org/1.81.0/alloc/string/struct.String.html" title="struct alloc::string::String">String</a></code></pre><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Formats a <code>std::time::Duration</code> into a human-readable string with specified precision.</p>
+<h2 id="parameters"><a class="doc-anchor" href="#parameters">§</a>Parameters</h2>
+<ul>
+<li><code>duration</code>: The <code>std::time::Duration</code> to format.</li>
+<li><code>prec</code>: The precision specifying the number of time units to display.
+<ul>
+<li>If <code>prec</code> is a positive integer, it limits the output to that many units, starting from the largest unit (e.g., years, weeks, days, etc.).</li>
+<li>If <code>prec</code> is -1, all non-zero units will be displayed.</li>
+</ul>
+</li>
+</ul>
+<h2 id="returns"><a class="doc-anchor" href="#returns">§</a>Returns</h2>
+<p>A <code>String</code> representing the formatted duration with the specified precision.</p>
+<h2 id="examples"><a class="doc-anchor" href="#examples">§</a>Examples</h2>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let </span>duration = std::time::Duration::new(<span class="number">80000</span>, <span class="number">0</span>); <span class="comment">// 80,000 seconds
+
+// Displaying only the largest unit (precision = 1)
+</span><span class="macro">assert_eq!</span>(time::format(duration, <span class="number">1</span>), <span class="string">"22h"</span>);
+
+<span class="comment">// Displaying the two largest units (precision = 2)
+</span><span class="macro">assert_eq!</span>(time::format(duration, <span class="number">2</span>), <span class="string">"22h 13m"</span>);
+
+<span class="comment">// Displaying all non-zero units (precision = -1)
+</span><span class="macro">assert_eq!</span>(time::format(duration, -<span class="number">1</span>), <span class="string">"22h 13m 20s"</span>);
+
+<span class="comment">// Duration of 0 seconds
+</span><span class="kw">let </span>duration_zero = std::time::Duration::new(<span class="number">0</span>, <span class="number">0</span>);
+<span class="macro">assert_eq!</span>(time::format(duration_zero, -<span class="number">1</span>), <span class="string">"0ns"</span>);</code></pre></div>
+<h2 id="notes"><a class="doc-anchor" href="#notes">§</a>Notes</h2>
+<ul>
+<li>The function handles up to years, weeks, days, hours, minutes, seconds, milliseconds, microseconds, and nanoseconds.</li>
+<li>Units with zero value are omitted in the output.</li>
+<li>The precision parameter affects the number of units shown, starting from the largest available unit.</li>
+</ul>
+<h2 id="units-conversion"><a class="doc-anchor" href="#units-conversion">§</a>Units Conversion</h2>
+<ul>
+<li>1 year = 365 days</li>
+<li>1 week = 7 days</li>
+<li>1 day = 24 hours</li>
+<li>1 hour = 60 minutes</li>
+<li>1 minute = 60 seconds</li>
+<li>1 second = 1,000 milliseconds</li>
+<li>1 millisecond = 1,000 microseconds</li>
+<li>1 microsecond = 1,000 nanoseconds</li>
+</ul>
+<h2 id="panics"><a class="doc-anchor" href="#panics">§</a>Panics</h2>
+<p>This function does not panic.</p>
+</div></details></section></div></main></body></html>

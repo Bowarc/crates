@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["clamp","get_distance"],"mod":["arc","circle","collision","interpolation","line","point","rect","vec2d"],"type":["Vec2"]};

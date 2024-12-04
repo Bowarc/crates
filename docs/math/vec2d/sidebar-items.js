@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["IndexOutOfBoundsError","Vec2D","Vec2DIterator"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["normalize_p2","two_points_angle"],"struct":["Point"]};

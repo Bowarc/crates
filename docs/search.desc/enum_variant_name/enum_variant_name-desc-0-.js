@@ -1,0 +1,1 @@
+searchState.loadedDescShard("enum_variant_name", 0, "A procedural macro that derives a method for enums to …")
