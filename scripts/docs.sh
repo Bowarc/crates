@@ -14,9 +14,7 @@ echo Copying generated docs to ./docs
 cp -r ./target/doc/* ./docs
 
 echo Commiting docs
-
 git add ./docs
-
 git commit -m "Updating docs"
 
 echo Pushing docs
