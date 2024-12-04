@@ -64,10 +64,11 @@ impl ThreadPool {
     ///
     /// # Returns
     /// An [`ArcFuture<O>`] that can be used to retrieve the result of the closure once it has completed.
-    pub fn run<O: Send + 'static, F: FnOnce() -> O + Send + std::panic::UnwindSafe + 'static>(
-        &self,
-        task: F,
-    ) -> ArcFuture<O> {
+    pub fn run<F, O>(&self, task: F) -> ArcFuture<O>
+    where
+        F: FnOnce() -> O + Send + std::panic::UnwindSafe + 'static,
+        O: Send + 'static,
+    {
         use std::sync::Arc;
 
         self.flying_tasks_count
@@ -86,53 +87,7 @@ impl ThreadPool {
 
         self.sender
             .send(Box::new(move |worker_id| {
-                // data_sender.send(future::FutureUpdate::Started).unwrap();
-                future.set_started();
-                match std::panic::catch_unwind(task) {
-                    Ok(output) => {
-                        future.set_done(output);
-                        // data_sender
-                        //     .send(future::FutureUpdate::Done(output))
-                        //     .unwrap();
-                    }
-                    Err(payload) => {
-                        future.set_panicked();
-                        // data_sender.send(future::FutureUpdate::Panicked).unwrap();
-
-                        error!("Worker {worker_id} panicked, dropping the payload");
-
-                        /*
-                            Extra-safe behavior, not sure if it's worth keeping
-                            This ensure that if your payload ( panic!(payload) ) panics on drop
-                            This will catch that and leak the payload to safely continue,
-
-                            This would cause a double panic before it being dropped, which is kinda ugly,
-                            ig i could try hiding it with a custom hook,
-                            (is it even a good idea to silence that 2nd panic ?, silencing an error is often bad, more so if it's not your error)
-                            (Can you have race conditions removing and setting panic hooks like that ?)
-                            but payload that panics on drop are so rare that i don't think it's nessessary
-                        */
-                        {
-                            // save the current hook in case it's not the default one
-                            // let old_hook = std::panic::take_hook();
-
-                            // Setting silent hook
-                            // std::panic::set_hook(Box::new(|_| {}));
-
-                            if let Err(panicking_payload) =
-                                std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-                                    drop(payload)
-                                }))
-                            {
-                                Box::leak(panicking_payload);
-                            }
-
-                            // set the old hook back
-                            // std::panic::set_hook(old_hook);
-                        }
-                    }
-                };
-                ftc.fetch_sub(1, std::sync::atomic::Ordering::AcqRel);
+                worker::task_exec_helper(future, task, worker_id, ftc);
             }))
             .unwrap();
 
