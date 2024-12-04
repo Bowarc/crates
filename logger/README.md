@@ -1,8 +1,12 @@
 ## A simple wrapper arround the [fern](https://docs.rs/fern) logger
 
+### Documentation
+
+The documentation for this crate can be found [here](https://bowarc.github.io/crates/logger)
+
 #### Use example:
 
-cargo.toml
+Cargo.toml
 ```toml
 [dependencies]
 logger = {git = "https://github.com/Bowarc/Crates.git", package = "logger"}
@@ -18,6 +22,7 @@ let cfg = logger::LoggerConfig::new()
     .add_filter("naga", log::LevelFilter::Warn)
     .add_filter("networking", log::LevelFilter::Debug)
     .add_filter("ggez", log::LevelFilter::Warn);
+
 // Set the second parametter to None if you don't want any log file
 logger::init(cfg, Some("log_file.log"));
 ``` 

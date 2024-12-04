@@ -1,4 +1,8 @@
-## Simple Tcp connections
+## TCP socket and proxy
+
+### Documentation
+
+The documentation for this crate can be found [here](https://bowarc.github.io/crates/networking)
 
 ### Features
 - Socket: A socket-style wrapper arround rust's `std::net::TcpStream` with generics Read and Write types
@@ -8,7 +12,7 @@
 
 #### Use example for Socket:
 
-cargo.toml
+Cargo.toml
 ```toml
 [dependencies]
 networking = {git = "https://github.com/Bowarc/Crates.git", package = "networking"}
@@ -47,7 +51,7 @@ let _sent_res: Result<networking::socket::Header, networking::socket::SocketErro
 
 ### Use example for Proxy:
 
-cargo.toml
+Cargo.toml
 ```toml
 [dependencies]
 networking = {git = "https://github.com/Bowarc/Crates.git", package = "networking"}

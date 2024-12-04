@@ -1,8 +1,12 @@
 ## Simple random number and string generation
 
+### Documentation
+
+The documentation for this crate can be found [here](https://bowarc.github.io/crates/random)
+
 #### Use example:
 
-cargo.toml
+Cargo.toml
 ```toml
 [dependencies]
 random = {git = "https://github.com/Bowarc/Crates.git", package = "random"}

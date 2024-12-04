@@ -1,9 +1,12 @@
-## Threadpool and channels
+## Channels, Threadpools and sync futures.
 
+### Documentation
+
+The documentation for this crate can be found [here](https://bowarc.github.io/crates/threading)
 
 #### Use example:
 
-cargo.toml
+Cargo.toml
 ```toml
 [dependencies]
 threading = {git = "https://github.com/Bowarc/Crates.git", package = "threading"}

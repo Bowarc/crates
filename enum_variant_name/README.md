@@ -1,5 +1,9 @@
 ## Derive macro to get the variant name of an enum
 
+### Documentation
+
+The documentation for this crate can be found [here](https://bowarc.github.io/crates/enum_variant_name)
+
 #### Use example:
 
 cargo.toml
