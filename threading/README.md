@@ -23,7 +23,7 @@ let pool_handle_1 = ThreadPool::new(15); // How many threads you want
 // When you drop all the handles, the remote threads will close
 let pool_handle_2 = pool_handle_1.clone();
 let _pool_handle_3 = pool_handle_1.clone();
-let _pool_handle_4 = pool_handle_3.clone();
+let _pool_handle_4 = _pool_handle_3.clone();
 
 // This will send the closure to a thread to be ran as soon as possible, non-blocking for the main thread.
 // The future received from pool.run is used to get the output of the closure.
@@ -42,7 +42,7 @@ let state = future_1.state(); // assert_eq!(state, FutureState::Done);
 // To get the output of the future, use
 let output = future_1.output(); // assert_eq!(output, String::from("Hi"));
 // The output method consumes the value, calling it multiple times will cause a panic
-// This because the Future struct **does not** bind the output value to be Copy nor Clone
+// This because the Future struct does not bind the output value to be Copy nor Clone
 let _ = future_1.output(); // panics
 
 
