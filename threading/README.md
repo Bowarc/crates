@@ -79,7 +79,7 @@ let panicking_future = pool_handle_1.run(|| panic!("Expected panic"));
 // This call will not block the main thread indefinetly
 panicking_future.wait();
 // At this point, we know the closure has finished it's execution, 
-// but we don't know that it hsuccessfully ran or panicked.
+// but we don't know if it has successfully ran or panicked.
 
 // We can check that using the state
 assert_eq!(panicking_future.state(), FutureState::Panicked);
