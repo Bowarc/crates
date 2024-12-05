@@ -14,7 +14,7 @@ fn all() {
 
     std::thread::spawn(move || c2.send(T2Msg::Hi));
 
-    let msg: T2Msg = c1.recv().unwrap();
+    let _msg: T2Msg = c1.recv().unwrap();
     // println!("{msg:?}"); // Hi
 
     // Will return after 1.5 second or before if it received a msg

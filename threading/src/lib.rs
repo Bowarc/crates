@@ -2,7 +2,8 @@
 extern crate log;
 
 mod channel;
+pub use channel::Channel;
+
 pub mod pool;
 pub use pool::ThreadPool;
 
-pub use channel::Channel;

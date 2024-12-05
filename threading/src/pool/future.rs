@@ -24,10 +24,7 @@ impl<T> Future<T> {
     // It's actually required to not get &mut self, as we store it in an Arc and we only do Atomics operations
     #[inline]
     fn set_state(&self, new_state: FutureState) {
-        {
-            let mut guard = self.state.lock();
-            *guard = new_state;
-        }
+        *self.state.lock() = new_state;
 
         let _has_a_thread_been_woken_up = self.condvar.notify_one();
     }
@@ -37,9 +34,9 @@ impl<T> Future<T> {
     }
 
     pub(crate) fn set_done(&self, output: T) {
-        let mut data_lock = self.data.lock();
+        *self.data.lock() = Some(output);
+        
         self.set_state(FutureState::Done);
-        *data_lock = Some(output);
     }
 
     pub(crate) fn set_panicked(&self) {
@@ -87,7 +84,10 @@ impl<T> Future<T> {
             "Can't read the output of a task that has not completed successfully"
         );
 
-        self.data.lock().take().unwrap()
+        match self.data.lock().take(){
+            Some(output) => output,
+            None => panic!("The output of this future has already been moved out"),
+        }
     }
 }
 
