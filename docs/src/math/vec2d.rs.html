@@ -281,6 +281,9 @@
 <a href="#281" id="281">281</a>
 <a href="#282" id="282">282</a>
 <a href="#283" id="283">283</a>
+<a href="#284" id="284">284</a>
+<a href="#285" id="285">285</a>
+<a href="#286" id="286">286</a>
 </pre></div><pre class="rust"><code><span class="comment">/*
     for mental comprehension
     it can be visualized like that (numbers are indexes)
@@ -292,12 +295,15 @@
         [16, 17, 18, 19],
         [20, 21, 22, 23],
     ]
-
+    + making a list of columns doesn't make any sense
 */
 </span><span class="kw">pub struct </span>IndexOutOfBoundsError;
 
-<span class="comment">// + making a list of columns doesn't make any sense
-</span><span class="attr">#[derive(Debug)]
+<span class="attr">#[cfg_attr(
+    feature = <span class="string">"serde"</span>,
+    derive(serde::Deserialize, serde::Serialize),
+)]
+#[derive(Debug)]
 </span><span class="kw">pub struct </span>Vec2D&lt;T&gt; {
     elems: Vec&lt;T&gt;,
     size: <span class="kw">crate</span>::Vec2,
