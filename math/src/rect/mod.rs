@@ -7,7 +7,8 @@ use cache::*;
 #[cfg_attr(
     feature = "serde",
     derive(serde::Deserialize, serde::Serialize),
-    serde(from = "InnerRect")
+    serde(from = "InnerRect"),
+    serde(into = "InnerRect")
 )]
 #[derive(Clone, Copy, Debug)]
 pub struct Rect {
@@ -245,6 +246,12 @@ impl From<InnerRect> for Rect{
             inner,
             cache: PointCache::new(inner)
         }
+    }
+}
+
+impl From<Rect> for InnerRect{
+    fn from(rect: Rect) -> Self {
+        rect.inner
     }
 }
 
