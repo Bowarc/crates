@@ -4,15 +4,21 @@ use inner::*;
 mod cache;
 use cache::*;
 
+#[cfg_attr(
+    feature = "serde",
+    derive(serde::Deserialize, serde::Serialize),
+    serde(from = "InnerRect")
+)]
 #[derive(Clone, Copy, Debug)]
 pub struct Rect {
     inner: InnerRect,
+    
+    #[cfg_attr(feature = "serde", serde(skip_serializing))]   
     cache: PointCache,
 }
 
 impl Rect {
     //About caching, idk if i'll re-implement it now that i found the math to make things cleanly
-
     pub fn new(
         topleft: impl Into<crate::Point>,
         size: impl Into<crate::Vec2>,
@@ -230,6 +236,15 @@ impl std::fmt::Display for Rect {
             self.height(),
             self.rotation()
         )
+    }
+}
+
+impl From<InnerRect> for Rect{
+    fn from(inner: InnerRect) -> Self {
+        Self{
+            inner,
+            cache: PointCache::new(inner)
+        }
     }
 }
 
