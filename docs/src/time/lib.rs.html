@@ -397,6 +397,7 @@
 <a href="#397" id="397">397</a>
 <a href="#398" id="398">398</a>
 <a href="#399" id="399">399</a>
+<a href="#400" id="400">400</a>
 </pre></div><pre class="rust"><code><span class="doccomment">/// A delay for game animations (e.g., animation frames).
 ///
 /// # Examples
@@ -435,7 +436,8 @@
 </span><span class="kw">pub struct </span>DTDelay {
     starting_timeout_s: f64, <span class="comment">// Initial timeout value in seconds
 
-    </span><span class="attr">#[derivative(PartialEq = <span class="string">"ignore"</span>)]
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">"serde"</span>, serde(skip_serializing))]
+    #[derivative(PartialEq = <span class="string">"ignore"</span>)]
     </span><span class="comment">// Ignore this field when comparing two DTDelay instances for equality
     // because it is too precise to reliably compare.
     </span>timeout_s: f64, <span class="comment">// Current timeout value in seconds; set to the desired time, then decrease with delta time until it reaches 0
