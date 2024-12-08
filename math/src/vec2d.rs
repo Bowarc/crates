@@ -9,11 +9,14 @@
         [16, 17, 18, 19],
         [20, 21, 22, 23],
     ]
-
+    + making a list of columns doesn't make any sense
 */
 pub struct IndexOutOfBoundsError;
 
-// + making a list of columns doesn't make any sense
+#[cfg_attr(
+    feature = "serde",
+    derive(serde::Deserialize, serde::Serialize),
+)]
 #[derive(Debug)]
 pub struct Vec2D<T> {
     elems: Vec<T>,
