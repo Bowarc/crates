@@ -36,6 +36,7 @@
 pub struct DTDelay {
     starting_timeout_s: f64, // Initial timeout value in seconds
 
+    #[cfg_attr(feature = "serde", serde(skip_serializing))]
     #[derivative(PartialEq = "ignore")]
     // Ignore this field when comparing two DTDelay instances for equality
     // because it is too precise to reliably compare.
