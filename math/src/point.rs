@@ -2,6 +2,8 @@
 #[cfg_attr(
     feature = "serde",
     derive(serde::Deserialize, serde::Serialize),
+    serde(from = "(f64, f64)"),
+    serde(into = "(f64, f64)")
 )]
 pub struct Point {
     pub x: f64,
