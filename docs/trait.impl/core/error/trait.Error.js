@@ -1,3 +1,9 @@
-(function() {var implementors = {
-"networking":[["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.81.0/core/error/trait.Error.html\" title=\"trait core::error::Error\">Error</a> for <a class=\"enum\" href=\"networking/error/enum.NetworkError.html\" title=\"enum networking::error::NetworkError\">NetworkError</a>"],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.81.0/core/error/trait.Error.html\" title=\"trait core::error::Error\">Error</a> for <a class=\"enum\" href=\"networking/proxy/enum.ProxyError.html\" title=\"enum networking::proxy::ProxyError\">ProxyError</a>"],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.81.0/core/error/trait.Error.html\" title=\"trait core::error::Error\">Error</a> for <a class=\"enum\" href=\"networking/socket/enum.SocketError.html\" title=\"enum networking::socket::SocketError\">SocketError</a>"]]
-};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
+(function() {
+    var implementors = Object.fromEntries([["networking",[["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.83.0/core/error/trait.Error.html\" title=\"trait core::error::Error\">Error</a> for <a class=\"enum\" href=\"networking/error/enum.NetworkError.html\" title=\"enum networking::error::NetworkError\">NetworkError</a>"],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.83.0/core/error/trait.Error.html\" title=\"trait core::error::Error\">Error</a> for <a class=\"enum\" href=\"networking/proxy/enum.ProxyError.html\" title=\"enum networking::proxy::ProxyError\">ProxyError</a>"],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.83.0/core/error/trait.Error.html\" title=\"trait core::error::Error\">Error</a> for <a class=\"enum\" href=\"networking/socket/enum.SocketError.html\" title=\"enum networking::socket::SocketError\">SocketError</a>"]]]]);
+    if (window.register_implementors) {
+        window.register_implementors(implementors);
+    } else {
+        window.pending_implementors = implementors;
+    }
+})()
+//{"start":57,"fragment_lengths":[843]}
