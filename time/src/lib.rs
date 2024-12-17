@@ -376,7 +376,7 @@ pub fn timeit_mut<F: FnMut() -> T, T>(mut f: F) -> (T, std::time::Duration) {
     (f(), start.elapsed())
 }
 
-/// Used to time the execution of a function with mutable parameters
+/// Used to time the execution of an async function
 /// # Example
 /// ```
 /// use time::timeit_async;
