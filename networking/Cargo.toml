@@ -9,8 +9,8 @@ edition = "2021"
 bincode = "1.3.3"
 log.workspace = true
 serde = { workspace = true, features = ["derive"] }
-thiserror = "1.0.48"
+thiserror = "2.0.10"
 triple_buffer = { git = "https://github.com/Bowarc/triple-buffer.git"}
 threading = {path = "../threading"}
 time = {path = "../time"}
-spin_sleep = "1.1.1"
+spin_sleep = "1.3.0"
