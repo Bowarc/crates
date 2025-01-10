@@ -22,8 +22,8 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn output(mut self, output: Output) -> Self {
-        self.output = output;
+    pub fn output(mut self, output: impl Into<Output>) -> Self {
+        self.output = output.into();
 
         self
     }
@@ -69,6 +69,19 @@ impl Output {
         }
     }
 }
+
+impl<T: OutputStream + 'static> From<Box<T>> for Output{
+    fn from(steam: Box<T>) -> Self {
+        Output::CustomStream(steam)
+    }
+}
+
+impl From<std::path::PathBuf> for Output{
+    fn from(path: std::path::PathBuf) -> Self {
+        Output::File(path)
+    }
+}
+
 
 impl From<Config> for Vec<Config> {
     fn from(cfg: Config) -> Self {

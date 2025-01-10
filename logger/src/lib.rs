@@ -2,7 +2,7 @@ mod config;
 mod logger;
 use std::sync::mpsc::{self, Receiver, Sender};
 
-pub use config::{Config, Output};
+pub use config::{Config, Output, OutputStream};
 
 struct ProxyLogger {
     sender: Sender<Message>,
@@ -40,7 +40,7 @@ pub fn init(cfgs: impl Into<Vec<Config>>) {
 
     let (sender, receiver) = mpsc::channel::<Message>();
     std::thread::Builder::new()
-        .name("Logger thread".to_string())
+        .name("logger".to_string())
         .spawn(move || {
             logger(
                 receiver,
