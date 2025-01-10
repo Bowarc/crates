@@ -3,7 +3,7 @@
 
 - [**Enum Variant Name**](./enum_variant_name/README.md): Provides a convenient derive macro to retrieve the variant name of an enum in Rust.
 
-- [**Logger**](./logger/README.md): Straightforward wrapper around the [fern](https://docs.rs/fern) logger, simplifying logging configuration and setup.
+- [**Logger**](./logger/README.md): A multilogger based on the [log](https://docs.rs/log) crate
 
 - [**Mem**](./mem/README.md): Nothing really interesting here for now.
 
