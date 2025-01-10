@@ -53,6 +53,10 @@ pub fn init(cfgs: impl Into<Vec<Config>>) {
 
     log::set_max_level(log::LevelFilter::Trace);
     log::set_boxed_logger(Box::new(ProxyLogger { sender })).unwrap();
+
+    log_panics::Config::new()
+        .backtrace_mode(log_panics::BacktraceMode::Resolved)
+        .install_panic_hook()
 }
 
 enum Message {

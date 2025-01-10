@@ -8,7 +8,7 @@ use std::{
     time::Duration,
 };
 
-use parking_lot::Mutex;
+use std::sync::Mutex;
 
 #[derive(Clone)]
 struct Writer {
@@ -25,16 +25,16 @@ impl Writer {
     }
 
     fn get(&self, index: usize) -> Option<String> {
-        let offsets = self.offsets.lock(); // Lock the offsets for safe access
+        let offsets = self.offsets.lock().unwrap(); // Lock the offsets for safe access
         if index < offsets.len() {
             let start = offsets[index];
             let end = if index + 1 < offsets.len() {
                 offsets[index + 1]
             } else {
-                self.data.lock().len() // Lock the data to get its length
+                self.data.lock().unwrap().len() // Lock the data to get its length
             };
 
-            let data = self.data.lock(); // Lock the data for safe access
+            let data = self.data.lock().unwrap(); // Lock the data for safe access
             let slice = &data[start..end];
             std::str::from_utf8(slice).map(|s| s.to_string()).ok() // Convert to String, returning None if invalid UTF-8
         } else {
@@ -45,8 +45,8 @@ impl Writer {
 
 impl Write for Writer {
     fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
-        let mut data = self.data.lock(); // Lock the data for safe access
-        let mut offsets = self.offsets.lock(); // Lock the offsets for safe access
+        let mut data = self.data.lock().unwrap(); // Lock the data for safe access
+        let mut offsets = self.offsets.lock().unwrap(); // Lock the offsets for safe access
 
         offsets.push(data.len());
         data.extend_from_slice(buf);
