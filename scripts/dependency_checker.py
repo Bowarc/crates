@@ -63,9 +63,9 @@ class Dependencies:
         return self.specifics + self.globals
 
     def fetch(self) -> None:
-        cargo_toml: str = os.path.join(self.path, "cargo.toml")
+        cargo_toml: str = os.path.join(self.path, "Cargo.toml")
         try:
-            with open(cargo_toml, "r") as f:
+            with open(cargo_toml, "r", encoding="utf-8") as f:
                 found_dependencies: bool = False
 
                 for line in f:
@@ -147,7 +147,7 @@ def rule2(package_dependencies: List[Dependencies]) -> None:
             for package_dep in package_dependencies
             if package_dep.path == "."
         ][0]
-    except Exception as e:
+    except Exception:
         print(f"{RED}(Rule 2){RESET} No global package found")
         return
 
