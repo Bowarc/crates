@@ -10,7 +10,7 @@ Cargo.toml
 ```toml
 [dependencies]
 time = {git = "https://github.com/Bowarc/Crates.git", package = "time"}
-``` 
+```
 main.rs
 ```rust
 // Delay of 1.5 second

@@ -17,7 +17,7 @@ Cargo.toml
 [dependencies]
 networking = {git = "https://github.com/Bowarc/Crates.git", package = "networking"}
 serde = { version = "1.0.188", features = ["derive"] }
-``` 
+```
 main.rs
 ```rust
 #[derive(Clone, Debug, PartialEq, serde::Serialize, serde::Deserialize)]

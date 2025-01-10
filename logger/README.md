@@ -1,4 +1,4 @@
-## A custom logger based on the [log](https://docs.rs/log) crate
+## A multilogger based on the [log](https://docs.rs/log) crate
 
 ### Documentation
 

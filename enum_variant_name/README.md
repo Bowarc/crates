@@ -10,7 +10,7 @@ cargo.toml
 ```toml
 [dependencies]
 enum_variant_name = {git = "https://github.com/Bowarc/Crates.git", package = "enum_variant_name"}
-``` 
+```
 main.rs
 ```rust
 #[derive(enum_variant_name::VariantName)]

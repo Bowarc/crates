@@ -10,7 +10,7 @@ Cargo.toml
 ```toml
 [dependencies]
 random = {git = "https://github.com/Bowarc/Crates.git", package = "random"}
-``` 
+```
 main.rs
 ```rust
 // 0, 1, 2, 3, 4, 5, 6, 7, 8, 9
