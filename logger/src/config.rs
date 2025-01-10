@@ -1,4 +1,4 @@
-use std::{io::Write, path::PathBuf};
+use std::{io::Write, path::PathBuf, str::FromStr};
 
 use hashbrown::HashMap;
 use log::LevelFilter;
@@ -79,6 +79,12 @@ impl<T: OutputStream + 'static> From<Box<T>> for Output{
 impl From<std::path::PathBuf> for Output{
     fn from(path: std::path::PathBuf) -> Self {
         Output::File(path)
+    }
+}
+
+impl From<&str> for Output{
+    fn from(path: &str) -> Self {
+        Output::File(PathBuf::from_str(path).unwrap())
     }
 }
 
