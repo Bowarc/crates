@@ -13,4 +13,4 @@ members = [
 
 [workspace.dependencies]
 serde = "1.0.217"
-log = "0.4.20"
+log = {version = "0.4.20", features = ["std"] }
