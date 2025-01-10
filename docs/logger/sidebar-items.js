@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["init","test"],"struct":["LoggerConfig"]};
+window.SIDEBAR_ITEMS = {"enum":["Output"],"fn":["init"],"struct":["Config"],"trait":["OutputStream"]};
