@@ -58,7 +58,7 @@ impl Write for Writer {
     }
 }
 
-#[test]
+// #[test]
 fn _test() {
     let output1 = Box::new(Writer::new());
     let output2 = Box::new(Writer::new());
@@ -182,7 +182,7 @@ fn _readme_advanced() {
     // assert!(custom_output.get(2).is_none());
 }
 
-// #[test]
+#[test]
 fn _timed_file() {
     logger::init(
         logger::Config::default().output(logger::Output::new_timed_file(

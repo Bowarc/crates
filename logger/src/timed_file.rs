@@ -47,13 +47,9 @@ impl TimedFile {
             return;
         }
 
-        let since = now.signed_duration_since(self.last_update);
-        let count = since.num_seconds() / self.interval.num_seconds();
-
-        self.last_update += self.interval * count as i32;
-        // while now.signed_duration_since(self.last_update) >= self.interval {
-        //     self.last_update += self.interval;
-        // }
+        self.last_update += self.interval
+            * (now.signed_duration_since(self.last_update).num_seconds()
+                / self.interval.num_seconds()) as i32;
 
         let Ok(new_path) = Self::gen_path(self.path.clone(), self.last_update) else {
             return;
