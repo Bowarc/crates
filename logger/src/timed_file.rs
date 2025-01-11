@@ -16,10 +16,23 @@ pub struct TimedFile {
 impl TimedFile {
     pub fn new(path: PathBuf, interval: Duration) -> Self {
         let datetime = Local::now();
+
+        let file = {
+            let path = Self::gen_path(path.clone(), datetime).unwrap();
+
+            match Self::open(path.clone()) {
+                Ok(file) => file, 
+                Err(why) => {
+                    eprintln!("[ERROR] Failed to create file at {path:?} due to: {why}");
+                    panic!();
+                },
+            }
+        };
+
         Self {
             interval,
             last_update: datetime,
-            inner_file: Self::open(Self::gen_path(path.clone(), datetime).unwrap()).unwrap(),
+            inner_file: file,
             path,
         }
     }
@@ -30,7 +43,7 @@ impl TimedFile {
 
     fn gen_path(mut path: PathBuf, datetime: DateTime<Local>) -> Result<PathBuf, PathBuf> {
         let Some(file_name) = path.file_name().and_then(|name| name.to_str()) else {
-            log::error!("Failed to generate new file name based on: {:?}", path);
+            eprintln!("[ERROR] Failed to generate new file name based on: {:?}", path);
             Err(path)?
         };
 

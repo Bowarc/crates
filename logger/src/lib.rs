@@ -4,7 +4,7 @@ mod timed_file;
 
 use std::sync::mpsc::{self, Receiver, Sender};
 
-pub use config::{Config, Output, OutputStream};
+pub use config::{Config, Output, OutputStream, ConfigError, InvalidOutputError};
 
 struct ProxyLogger {
     sender: Sender<Message>,
@@ -12,11 +12,6 @@ struct ProxyLogger {
 
 impl log::Log for ProxyLogger {
     fn enabled(&self, _metadata: &log::Metadata) -> bool {
-        // let enabled = self.cfgs.iter().any(|cfg| {
-        //     cfg.filters.get(metadata.target()).unwrap_or(&cfg.level) >= &metadata.level()
-        // });
-
-        // enabled
         true
     }
 
@@ -56,9 +51,9 @@ pub fn init(cfgs: impl Into<Vec<Config>>) {
     log::set_max_level(log::LevelFilter::Trace);
     log::set_boxed_logger(Box::new(ProxyLogger { sender })).unwrap();
 
-    log_panics::Config::new()
-        .backtrace_mode(log_panics::BacktraceMode::Resolved)
-        .install_panic_hook()
+    // log_panics::Config::new()
+    //     .backtrace_mode(log_panics::BacktraceMode::Resolved)
+    //     .install_panic_hook()
 }
 
 enum Message {

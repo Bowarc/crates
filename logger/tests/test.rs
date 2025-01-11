@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 #[macro_use]
 extern crate log;
 
@@ -56,6 +58,42 @@ impl Write for Writer {
     fn flush(&mut self) -> io::Result<()> {
         Ok(())
     }
+}
+
+#[test]
+fn config_output() {
+    logger::Config::default().try_output("test.log").unwrap();
+    logger::Config::default().try_output("../test.log").unwrap();
+
+    // Don't forget mkdir log
+    logger::Config::default()
+        .try_output("log/test.log")
+        .unwrap();
+    logger::Config::default()
+        .try_output("./log/test.log")
+        .unwrap();
+
+    assert_eq!(
+        logger::Config::default().try_output("").map(|_|()),
+        Err(logger::ConfigError::InvalidOutput(logger::InvalidOutputError::NotAFile))
+    );
+    assert_eq!(
+        logger::Config::default().try_output("/").map(|_| ()),
+        Err(logger::ConfigError::InvalidOutput(logger::InvalidOutputError::NotAFile))
+    );
+    assert_eq!(
+        logger::Config::default().try_output("./").map(|_| ()),
+        Err(logger::ConfigError::InvalidOutput(logger::InvalidOutputError::NotAFile))
+    );
+
+    assert_eq!(
+        logger::Config::default().try_output("./this_directory_does_not_exists/test.log").map(|_| ()),
+        Err(logger::ConfigError::InvalidOutput(logger::InvalidOutputError::DirectoryDoesNotExist))
+    );
+    assert_eq!(
+        logger::Config::default().try_output("/test.log").map(|_| ()),
+        Err(logger::ConfigError::InvalidOutput(logger::InvalidOutputError::ReadOnlyDirectory))
+    );
 }
 
 #[test]
