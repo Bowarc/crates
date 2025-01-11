@@ -6,4 +6,3 @@ pub use channel::Channel;
 
 pub mod pool;
 pub use pool::ThreadPool;
-

@@ -4,7 +4,7 @@ fn all() {
     enum T1Msg {
         //
     }
-    #[derive(PartialEq)] 
+    #[derive(PartialEq)]
     enum T2Msg {
         Hi,
         Hellow,

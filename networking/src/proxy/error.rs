@@ -7,7 +7,7 @@ pub enum ProxyError {
     ChannelSend(String),
     #[error("{0}")]
     ChannelRecv(String),
-    
+
     #[error("{0}")]
     SocketSend(String),
     #[error("{0}")]

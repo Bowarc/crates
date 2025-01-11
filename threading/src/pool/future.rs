@@ -35,7 +35,7 @@ impl<T> Future<T> {
 
     pub(crate) fn set_done(&self, output: T) {
         *self.data.lock() = Some(output);
-        
+
         self.set_state(FutureState::Done);
     }
 
@@ -84,7 +84,7 @@ impl<T> Future<T> {
             "Can't read the output of a task that has not completed successfully"
         );
 
-        match self.data.lock().take(){
+        match self.data.lock().take() {
             Some(output) => output,
             None => panic!("The output of this future has already been moved out"),
         }

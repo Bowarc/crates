@@ -241,7 +241,6 @@ impl<SRCW: crate::Message + 'static, SWCR: crate::Message + 'static> Proxy<SRCW,
                 }
             },
         }
-
     }
 
     /// here you receive message sent by the socket

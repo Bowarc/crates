@@ -1,8 +1,5 @@
 #[derive(Clone, Copy, Debug, PartialEq)]
-#[cfg_attr(
-    feature = "serde",
-    derive(serde::Deserialize, serde::Serialize),
-)]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub struct Line(pub super::Point, pub super::Point);
 impl Line {
     pub fn new(p0: super::Point, p1: super::Point) -> Self {

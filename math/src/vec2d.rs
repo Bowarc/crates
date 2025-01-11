@@ -13,10 +13,7 @@
 */
 pub struct IndexOutOfBoundsError;
 
-#[cfg_attr(
-    feature = "serde",
-    derive(serde::Deserialize, serde::Serialize),
-)]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 #[derive(Debug)]
 pub struct Vec2D<T> {
     elems: Vec<T>,
@@ -72,7 +69,7 @@ impl<T: Clone + std::fmt::Debug> Vec2D<T> {
         rect: crate::Rect,
         elem: T,
         ignore_errors: bool,
-    ) -> Result<(), String>  {
+    ) -> Result<(), String> {
         if rect.width() == 0. || rect.height() == 0. {
             return Err(String::from(
                 "Due to common sense, rects of size 0 are not allowed in Vec2D::set_rect_from_elem",
@@ -81,9 +78,7 @@ impl<T: Clone + std::fmt::Debug> Vec2D<T> {
         for pt in self.rect_iter(rect) {
             // println!("Setting {elem:?} at pt {pt}");
             if self.set(pt, elem.clone()).is_err() && !ignore_errors {
-                return Err(
-                    format!("Could not set data at index: {pt:?}"),
-                );
+                return Err(format!("Could not set data at index: {pt:?}"));
             }
         }
         Ok(())

@@ -51,14 +51,16 @@ impl<SRCW: crate::Message, SWCR: crate::Message> NetworkStats<SRCW, SWCR> {
         &mut self,
         socket: &mut crate::Socket<SRCW, SWCR>,
     ) -> Result<(), crate::proxy::ProxyError> {
-        let Some(rtt) = &mut self.rtt_opt else{
-            return Ok(())
+        let Some(rtt) = &mut self.rtt_opt else {
+            return Ok(());
         };
 
         if rtt.needs_ping() {
             let msg = SWCR::default_ping();
             self.on_msg_send(&msg);
-            let header = socket.send(msg).map_err(|e| crate::proxy::ProxyError::SocketSend(e.to_string()))?;
+            let header = socket
+                .send(msg)
+                .map_err(|e| crate::proxy::ProxyError::SocketSend(e.to_string()))?;
             self.on_bytes_send(&header);
         }
 

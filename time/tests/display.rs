@@ -35,7 +35,6 @@ fn display() {
 
     println!("");
 
-
     println!("{}", time::format(Duration::from_secs(3661), -1));
     println!("{}", time::format(Duration::from_secs(31546321), -1));
 }

@@ -1,8 +1,5 @@
 #[derive(Clone, Copy, Debug, PartialEq)]
-#[cfg_attr(
-    feature = "serde",
-    derive(serde::Deserialize, serde::Serialize),
-)]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub struct Circle {
     pub center: super::Point,
     pub radius: f64,

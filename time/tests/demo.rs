@@ -12,10 +12,10 @@ fn all() {
         delay.restart();
     }
 
-    delay.update(2.); 
+    delay.update(2.);
     // Use this over `.restart` when you have low framerate or want extreme precision
     let overtime = delay.time_since_ended(); // 0.5
-    // Restart the timer but fake 0.5 seconds of elapsed time
+                                             // Restart the timer but fake 0.5 seconds of elapsed time
     delay.restart_custom_timeline(overtime);
 
     let mut stopwatch = time::Stopwatch::start_new();
@@ -50,17 +50,25 @@ fn all() {
 
     let (fn_out, dur): (bool, std::time::Duration) = time::timeit(|| fn1(15));
 
-    println!("fn1 ran for {} and returnred {}", time::format(dur, 1), fn_out);
+    println!(
+        "fn1 ran for {} and returnred {}",
+        time::format(dur, 1),
+        fn_out
+    );
     // fn1 ran for 200ns and returnred true
 
-    let fn2 = || -> i32{
+    let fn2 = || -> i32 {
         std::thread::sleep(std::time::Duration::from_secs_f32(1.2));
         15
     };
 
     let (fn_out, dur): (i32, std::time::Duration) = time::timeit(fn2);
 
-    println!("fn2 ran for {} and returnred {}", time::format(dur, 2), fn_out);
+    println!(
+        "fn2 ran for {} and returnred {}",
+        time::format(dur, 2),
+        fn_out
+    );
     // fn2 ran for 1s 200ms and returnred 15
 
     // Mutable args
@@ -73,6 +81,10 @@ fn all() {
 
     let (fn_out, dur): ((), std::time::Duration) = time::timeit_mut(|| fn3(&mut x));
 
-    println!("fn3 ran for {} and returnred {:?}", time::format(dur, 1), fn_out);
+    println!(
+        "fn3 ran for {} and returnred {:?}",
+        time::format(dur, 1),
+        fn_out
+    );
     // fn3 ran for 500ms and returnred ()
 }

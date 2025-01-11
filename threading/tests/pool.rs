@@ -118,7 +118,7 @@ fn doc() {
             let (hi, f) = future_3.output();
             assert_eq!(hi, String::from("Hi"));
             assert_eq!(f, false);
-            break
+            break;
         }
 
         // Do whatever

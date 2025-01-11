@@ -1,5 +1,3 @@
-
-
 // Idea (and most of the code) from https://github.com/ggez/ggez-goodies/blob/master/src/particle.rs
 
 // To make it simple, this is used to get a value by a %.delta-t

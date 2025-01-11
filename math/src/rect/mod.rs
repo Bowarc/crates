@@ -13,8 +13,8 @@ use cache::*;
 #[derive(Clone, Copy, Debug)]
 pub struct Rect {
     inner: InnerRect,
-    
-    #[cfg_attr(feature = "serde", serde(skip_serializing))]   
+
+    #[cfg_attr(feature = "serde", serde(skip_serializing))]
     cache: PointCache,
 }
 
@@ -214,7 +214,7 @@ impl std::ops::Sub<crate::Point> for Rect {
     }
 }
 
-#[cfg(feature ="ggez")]
+#[cfg(feature = "ggez")]
 impl From<Rect> for ggez::graphics::Rect {
     fn from(rect: Rect) -> ggez::graphics::Rect {
         ggez::graphics::Rect {
@@ -240,16 +240,16 @@ impl std::fmt::Display for Rect {
     }
 }
 
-impl From<InnerRect> for Rect{
+impl From<InnerRect> for Rect {
     fn from(inner: InnerRect) -> Self {
-        Self{
+        Self {
             inner,
-            cache: PointCache::new(inner)
+            cache: PointCache::new(inner),
         }
     }
 }
 
-impl From<Rect> for InnerRect{
+impl From<Rect> for InnerRect {
     fn from(rect: Rect) -> Self {
         rect.inner
     }

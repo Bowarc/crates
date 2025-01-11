@@ -99,7 +99,7 @@ impl<R: crate::Message, W: crate::Message> Socket<R, W> {
 
         self.last_header = None;
 
-        if message.is_exit(){
+        if message.is_exit() {
             return Err(SocketError::Exited);
         }
 
@@ -181,10 +181,9 @@ impl<R: crate::Message, W: crate::Message> Socket<R, W> {
     }
 }
 
-impl<R: crate::Message, W: crate::Message> std::ops::Drop for Socket<R, W>{
+impl<R: crate::Message, W: crate::Message> std::ops::Drop for Socket<R, W> {
     fn drop(&mut self) {
         // Don't care about the error, half the time it's gonna be disconnected anyway
         let _ = self.send(W::default_exit());
-
     }
 }

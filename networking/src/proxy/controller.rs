@@ -29,10 +29,9 @@ impl<R: crate::Message, W: crate::Message> ProxyController<R, W> {
     pub fn recv(&self) -> Result<super::ProxyMessage<R>, std::sync::mpsc::RecvError> {
         self.channel.recv()
     }
-    pub fn try_recv(&self) -> Result<super::ProxyMessage<R>, std::sync::mpsc::TryRecvError>{
+    pub fn try_recv(&self) -> Result<super::ProxyMessage<R>, std::sync::mpsc::TryRecvError> {
         self.channel.try_recv()
     }
-
 
     pub fn is_running(&self) -> bool {
         self.running.load(std::sync::atomic::Ordering::Relaxed)
@@ -43,15 +42,15 @@ impl<R: crate::Message, W: crate::Message> ProxyController<R, W> {
     }
 
     pub fn request_ping(&self) -> Result<(), std::sync::mpsc::SendError<W>> {
-        self.send(W::default_ping()) 
+        self.send(W::default_ping())
     }
 
     // Needs mut because it's updating before returning the data
-    pub fn stats(&mut self) -> &crate::NetworkStats<R, W>{
+    pub fn stats(&mut self) -> &crate::NetworkStats<R, W> {
         self.stats.read()
     }
 
-    pub fn thread_handle(&self) -> &std::thread::JoinHandle<()>{
+    pub fn thread_handle(&self) -> &std::thread::JoinHandle<()> {
         &self.thread_handle
     }
 }
