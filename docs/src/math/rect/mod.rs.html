@@ -282,8 +282,8 @@
 #[derive(Clone, Copy, Debug)]
 </span><span class="kw">pub struct </span>Rect {
     inner: InnerRect,
-    
-    <span class="attr">#[cfg_attr(feature = <span class="string">"serde"</span>, serde(skip_serializing))]   
+
+    <span class="attr">#[cfg_attr(feature = <span class="string">"serde"</span>, serde(skip_serializing))]
     </span>cache: PointCache,
 }
 
@@ -483,7 +483,7 @@
     }
 }
 
-<span class="attr">#[cfg(feature =<span class="string">"ggez"</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"ggez"</span>)]
 </span><span class="kw">impl </span>From&lt;Rect&gt; <span class="kw">for </span>ggez::graphics::Rect {
     <span class="kw">fn </span>from(rect: Rect) -&gt; ggez::graphics::Rect {
         ggez::graphics::Rect {
@@ -509,16 +509,16 @@
     }
 }
 
-<span class="kw">impl </span>From&lt;InnerRect&gt; <span class="kw">for </span>Rect{
+<span class="kw">impl </span>From&lt;InnerRect&gt; <span class="kw">for </span>Rect {
     <span class="kw">fn </span>from(inner: InnerRect) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>{
+        <span class="self">Self </span>{
             inner,
-            cache: PointCache::new(inner)
+            cache: PointCache::new(inner),
         }
     }
 }
 
-<span class="kw">impl </span>From&lt;Rect&gt; <span class="kw">for </span>InnerRect{
+<span class="kw">impl </span>From&lt;Rect&gt; <span class="kw">for </span>InnerRect {
     <span class="kw">fn </span>from(rect: Rect) -&gt; <span class="self">Self </span>{
         rect.inner
     }

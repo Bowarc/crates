@@ -54,8 +54,7 @@
 <a href="#53" id="53">53</a>
 <a href="#54" id="54">54</a>
 <a href="#55" id="55">55</a>
-<a href="#56" id="56">56</a>
-<a href="#57" id="57">57</a></pre></div><pre class="rust"><code><span class="kw">pub struct </span>ProxyController&lt;R: <span class="kw">crate</span>::Message, W: <span class="kw">crate</span>::Message&gt; {
+<a href="#56" id="56">56</a></pre></div><pre class="rust"><code><span class="kw">pub struct </span>ProxyController&lt;R: <span class="kw">crate</span>::Message, W: <span class="kw">crate</span>::Message&gt; {
     stats: triple_buffer::Output&lt;<span class="kw">crate</span>::NetworkStats&lt;R, W&gt;&gt;,
     channel: threading::Channel&lt;<span class="kw">super</span>::ProxyMessage&lt;R&gt;, W&gt;,
     running: std::sync::Arc&lt;std::sync::atomic::AtomicBool&gt;,
@@ -86,10 +85,9 @@
     <span class="kw">pub fn </span>recv(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw">super</span>::ProxyMessage&lt;R&gt;, std::sync::mpsc::RecvError&gt; {
         <span class="self">self</span>.channel.recv()
     }
-    <span class="kw">pub fn </span>try_recv(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw">super</span>::ProxyMessage&lt;R&gt;, std::sync::mpsc::TryRecvError&gt;{
+    <span class="kw">pub fn </span>try_recv(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw">super</span>::ProxyMessage&lt;R&gt;, std::sync::mpsc::TryRecvError&gt; {
         <span class="self">self</span>.channel.try_recv()
     }
-
 
     <span class="kw">pub fn </span>is_running(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.running.load(std::sync::atomic::Ordering::Relaxed)
@@ -100,15 +98,15 @@
     }
 
     <span class="kw">pub fn </span>request_ping(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), std::sync::mpsc::SendError&lt;W&gt;&gt; {
-        <span class="self">self</span>.send(W::default_ping()) 
+        <span class="self">self</span>.send(W::default_ping())
     }
 
     <span class="comment">// Needs mut because it's updating before returning the data
-    </span><span class="kw">pub fn </span>stats(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw">crate</span>::NetworkStats&lt;R, W&gt;{
+    </span><span class="kw">pub fn </span>stats(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw">crate</span>::NetworkStats&lt;R, W&gt; {
         <span class="self">self</span>.stats.read()
     }
 
-    <span class="kw">pub fn </span>thread_handle(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>std::thread::JoinHandle&lt;()&gt;{
+    <span class="kw">pub fn </span>thread_handle(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>std::thread::JoinHandle&lt;()&gt; {
         <span class="kw-2">&amp;</span><span class="self">self</span>.thread_handle
     }
 }

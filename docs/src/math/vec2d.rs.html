@@ -279,12 +279,7 @@
 <a href="#278" id="278">278</a>
 <a href="#279" id="279">279</a>
 <a href="#280" id="280">280</a>
-<a href="#281" id="281">281</a>
-<a href="#282" id="282">282</a>
-<a href="#283" id="283">283</a>
-<a href="#284" id="284">284</a>
-<a href="#285" id="285">285</a>
-<a href="#286" id="286">286</a></pre></div><pre class="rust"><code><span class="comment">/*
+<a href="#281" id="281">281</a></pre></div><pre class="rust"><code><span class="comment">/*
     for mental comprehension
     it can be visualized like that (numbers are indexes)
     [
@@ -299,10 +294,7 @@
 */
 </span><span class="kw">pub struct </span>IndexOutOfBoundsError;
 
-<span class="attr">#[cfg_attr(
-    feature = <span class="string">"serde"</span>,
-    derive(serde::Deserialize, serde::Serialize),
-)]
+<span class="attr">#[cfg_attr(feature = <span class="string">"serde"</span>, derive(serde::Deserialize, serde::Serialize))]
 #[derive(Debug)]
 </span><span class="kw">pub struct </span>Vec2D&lt;T&gt; {
     elems: Vec&lt;T&gt;,
@@ -358,7 +350,7 @@
         rect: <span class="kw">crate</span>::Rect,
         elem: T,
         ignore_errors: bool,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt;  {
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
         <span class="kw">if </span>rect.width() == <span class="number">0. </span>|| rect.height() == <span class="number">0. </span>{
             <span class="kw">return </span><span class="prelude-val">Err</span>(String::from(
                 <span class="string">"Due to common sense, rects of size 0 are not allowed in Vec2D::set_rect_from_elem"</span>,
@@ -367,9 +359,7 @@
         <span class="kw">for </span>pt <span class="kw">in </span><span class="self">self</span>.rect_iter(rect) {
             <span class="comment">// println!("Setting {elem:?} at pt {pt}");
             </span><span class="kw">if </span><span class="self">self</span>.set(pt, elem.clone()).is_err() &amp;&amp; !ignore_errors {
-                <span class="kw">return </span><span class="prelude-val">Err</span>(
-                    <span class="macro">format!</span>(<span class="string">"Could not set data at index: {pt:?}"</span>),
-                );
+                <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">"Could not set data at index: {pt:?}"</span>));
             }
         }
         <span class="prelude-val">Ok</span>(())

@@ -94,11 +94,13 @@
 <a href="#93" id="93">93</a>
 <a href="#94" id="94">94</a>
 <a href="#95" id="95">95</a>
-<a href="#96" id="96">96</a></pre></div><pre class="rust"><code><span class="kw">use </span>std::io::Write;
-
-<span class="kw">use </span>colored::ColoredString;
-<span class="kw">use </span>log::{Level, LevelFilter};
-<span class="kw">use </span><span class="kw">crate</span>::Config;
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a></pre></div><pre class="rust"><code><span class="kw">use </span>{
+    <span class="kw">crate</span>::Config,
+    colored::ColoredString,
+    log::{Level, LevelFilter},
+    std::io::Write,
+};
 
 <span class="kw">pub struct </span>Logger {
     output: Box&lt;<span class="kw">dyn </span><span class="kw">super</span>::config::OutputStream&gt;,

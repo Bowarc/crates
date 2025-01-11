@@ -28,14 +28,8 @@
 <a href="#27" id="27">27</a>
 <a href="#28" id="28">28</a>
 <a href="#29" id="29">29</a>
-<a href="#30" id="30">30</a>
-<a href="#31" id="31">31</a>
-<a href="#32" id="32">32</a>
-<a href="#33" id="33">33</a></pre></div><pre class="rust"><code><span class="attr">#[derive(Clone, Copy, Debug, PartialEq)]
-#[cfg_attr(
-    feature = <span class="string">"serde"</span>,
-    derive(serde::Deserialize, serde::Serialize),
-)]
+<a href="#30" id="30">30</a></pre></div><pre class="rust"><code><span class="attr">#[derive(Clone, Copy, Debug, PartialEq)]
+#[cfg_attr(feature = <span class="string">"serde"</span>, derive(serde::Deserialize, serde::Serialize))]
 </span><span class="kw">pub struct </span>Circle {
     <span class="kw">pub </span>center: <span class="kw">super</span>::Point,
     <span class="kw">pub </span>radius: f64,

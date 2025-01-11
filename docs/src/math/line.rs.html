@@ -65,14 +65,8 @@
 <a href="#64" id="64">64</a>
 <a href="#65" id="65">65</a>
 <a href="#66" id="66">66</a>
-<a href="#67" id="67">67</a>
-<a href="#68" id="68">68</a>
-<a href="#69" id="69">69</a>
-<a href="#70" id="70">70</a></pre></div><pre class="rust"><code><span class="attr">#[derive(Clone, Copy, Debug, PartialEq)]
-#[cfg_attr(
-    feature = <span class="string">"serde"</span>,
-    derive(serde::Deserialize, serde::Serialize),
-)]
+<a href="#67" id="67">67</a></pre></div><pre class="rust"><code><span class="attr">#[derive(Clone, Copy, Debug, PartialEq)]
+#[cfg_attr(feature = <span class="string">"serde"</span>, derive(serde::Deserialize, serde::Serialize))]
 </span><span class="kw">pub struct </span>Line(<span class="kw">pub </span><span class="kw">super</span>::Point, <span class="kw">pub </span><span class="kw">super</span>::Point);
 <span class="kw">impl </span>Line {
     <span class="kw">pub fn </span>new(p0: <span class="kw">super</span>::Point, p1: <span class="kw">super</span>::Point) -&gt; <span class="self">Self </span>{

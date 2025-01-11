@@ -187,8 +187,7 @@
 <a href="#186" id="186">186</a>
 <a href="#187" id="187">187</a>
 <a href="#188" id="188">188</a>
-<a href="#189" id="189">189</a>
-<a href="#190" id="190">190</a></pre></div><pre class="rust"><code><span class="kw">pub const </span>HEADER_SIZE: u64 = std::mem::size_of::&lt;Header&gt;() <span class="kw">as </span>u64;
+<a href="#189" id="189">189</a></pre></div><pre class="rust"><code><span class="kw">pub const </span>HEADER_SIZE: u64 = std::mem::size_of::&lt;Header&gt;() <span class="kw">as </span>u64;
 
 <span class="attr">#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Copy)]
 </span><span class="comment">// You can modify this struct to store whatever data you want, just be sure that your data's size can't change as it
@@ -289,7 +288,7 @@
 
         <span class="self">self</span>.last_header = <span class="prelude-val">None</span>;
 
-        <span class="kw">if </span>message.is_exit(){
+        <span class="kw">if </span>message.is_exit() {
             <span class="kw">return </span><span class="prelude-val">Err</span>(SocketError::Exited);
         }
 
@@ -371,10 +370,10 @@
     }
 }
 
-<span class="kw">impl</span>&lt;R: <span class="kw">crate</span>::Message, W: <span class="kw">crate</span>::Message&gt; std::ops::Drop <span class="kw">for </span>Socket&lt;R, W&gt;{
+<span class="kw">impl</span>&lt;R: <span class="kw">crate</span>::Message, W: <span class="kw">crate</span>::Message&gt; std::ops::Drop <span class="kw">for </span>Socket&lt;R, W&gt; {
     <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="comment">// Don't care about the error, half the time it's gonna be disconnected anyway
         </span><span class="kw">let _ </span>= <span class="self">self</span>.send(W::default_exit());
-
     }
-}</code></pre></div></section></main></body></html>
+}
+</code></pre></div></section></main></body></html>
