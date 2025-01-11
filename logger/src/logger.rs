@@ -1,8 +1,9 @@
-use std::io::Write;
-
-use colored::ColoredString;
-use log::{Level, LevelFilter};
-use crate::Config;
+use {
+    crate::Config,
+    colored::ColoredString,
+    log::{Level, LevelFilter},
+    std::io::Write,
+};
 
 pub struct Logger {
     output: Box<dyn super::config::OutputStream>,

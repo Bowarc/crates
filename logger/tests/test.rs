@@ -169,13 +169,39 @@ fn _readme_advanced() {
     // - This message is gonna be written to the test.log file without any color
 
     sleep(Duration::from_millis(1)); // The logger uses a seccond thread to avoid blocking the main one
-    // so for tests, we need to wait just a bit
+                                     // so for tests, we need to wait just a bit
 
     // Here we can see, our custom output has only one line
-    assert!(custom_output.get(0).unwrap().contains("This is an important error")); // I use contains because the time is also printed, which is variable
-
+    assert!(custom_output
+        .get(0)
+        .unwrap()
+        .contains("This is an important error")); // I use contains because the time is also printed, which is variable
 
     // It technically has 2 entries, but the 2nd one is the "\n" of the first line, that's how std::io::Write works
     // assert_eq!(custom_output.get(1), Some("\n".to_string()));
     // assert!(custom_output.get(2).is_none());
+}
+
+// #[test]
+fn _timed_file() {
+    logger::init(
+        logger::Config::default().output(logger::Output::new_timed_file(
+            "timed.log",
+            Duration::from_secs(1),
+        )),
+    );
+
+    debug!("Hiiii");
+    error!("Error1");
+    sleep(Duration::from_secs_f32(1.1));
+
+    debug!("Sup");
+    error!("error 2");
+
+    sleep(Duration::from_secs_f32(1.9));
+    
+    debug!("holaa");
+    error!("error 3");
+
+    sleep(Duration::from_millis(1))
 }

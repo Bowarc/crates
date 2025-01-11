@@ -1,7 +1,7 @@
-use std::{io::Write, path::PathBuf, str::FromStr};
-
+use chrono::Duration;
 use hashbrown::HashMap;
 use log::LevelFilter;
+use std::{fs::OpenOptions, io::Write, path::PathBuf, str::FromStr};
 
 pub trait OutputStream: Write + Send + Sync {}
 
@@ -9,6 +9,7 @@ impl<T> OutputStream for T where T: Write + Send + Sync {}
 
 pub enum Output {
     File(PathBuf),
+    TimedFile { path: PathBuf, interval: Duration },
     CustomStream(Box<dyn OutputStream>),
     Stdout,
     StdErr,
@@ -40,9 +41,9 @@ impl Config {
         self
     }
 
-    pub fn filters(mut self, filters: &[(&str, LevelFilter)]) -> Self{
-        for (name, filter) in filters.iter(){
-            self = self.filter(name,*filter);
+    pub fn filters(mut self, filters: &[(&str, LevelFilter)]) -> Self {
+        for (name, filter) in filters.iter() {
+            self = self.filter(name, *filter);
         }
         self
     }
@@ -54,15 +55,24 @@ impl Config {
 }
 
 impl Output {
+    pub fn new_timed_file(path: impl Into<PathBuf>, interval: impl Into<std::time::Duration>) -> Self {
+        Self::TimedFile {
+            path: path.into(),
+            interval: Duration::from_std(interval.into()).unwrap(),
+        }
+    }
     pub(crate) fn into_stream(self) -> Box<dyn OutputStream> {
         match self {
             Self::File(path) => Box::new(
-                std::fs::OpenOptions::new()
+                OpenOptions::new()
                     .create(true)
                     .append(true)
                     .open(path)
                     .unwrap(),
             ),
+            Self::TimedFile { path, interval } => {
+                Box::new(crate::timed_file::TimedFile::new(path, interval))
+            }
             Self::CustomStream(stream) => stream,
             Self::Stdout => Box::new(std::io::stdout()),
             Self::StdErr => Box::new(std::io::stderr()),
@@ -70,24 +80,23 @@ impl Output {
     }
 }
 
-impl<T: OutputStream + 'static> From<Box<T>> for Output{
+impl<T: OutputStream + 'static> From<Box<T>> for Output {
     fn from(steam: Box<T>) -> Self {
         Output::CustomStream(steam)
     }
 }
 
-impl From<std::path::PathBuf> for Output{
-    fn from(path: std::path::PathBuf) -> Self {
+impl From<PathBuf> for Output {
+    fn from(path: PathBuf) -> Self {
         Output::File(path)
     }
 }
 
-impl From<&str> for Output{
+impl From<&str> for Output {
     fn from(path: &str) -> Self {
         Output::File(PathBuf::from_str(path).unwrap())
     }
 }
-
 
 impl From<Config> for Vec<Config> {
     fn from(cfg: Config) -> Self {

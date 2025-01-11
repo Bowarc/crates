@@ -1,5 +1,7 @@
 mod config;
 mod logger;
+mod timed_file;
+
 use std::sync::mpsc::{self, Receiver, Sender};
 
 pub use config::{Config, Output, OutputStream};
