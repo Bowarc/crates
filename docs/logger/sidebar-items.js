@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["Output"],"fn":["init"],"struct":["Config"],"trait":["OutputStream"]};
+window.SIDEBAR_ITEMS = {"enum":["ConfigError","InvalidOutputError","Output"],"fn":["init"],"struct":["Config"],"trait":["OutputStream"]};

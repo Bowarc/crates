@@ -81,7 +81,16 @@
 <a href="#80" id="80">80</a>
 <a href="#81" id="81">81</a>
 <a href="#82" id="82">82</a>
-<a href="#83" id="83">83</a></pre></div><pre class="rust"><code><span class="kw">use </span>std::{
+<a href="#83" id="83">83</a>
+<a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
+<a href="#89" id="89">89</a>
+<a href="#90" id="90">90</a>
+<a href="#91" id="91">91</a>
+<a href="#92" id="92">92</a></pre></div><pre class="rust"><code><span class="kw">use </span>std::{
     fs::{File, OpenOptions},
     io::{<span class="self">self</span>, Write},
     path::PathBuf,
@@ -99,10 +108,23 @@
 <span class="kw">impl </span>TimedFile {
     <span class="kw">pub fn </span>new(path: PathBuf, interval: Duration) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>datetime = Local::now();
+
+        <span class="kw">let </span>file = {
+            <span class="kw">let </span>path = <span class="self">Self</span>::gen_path(path.clone(), datetime).unwrap();
+
+            <span class="kw">match </span><span class="self">Self</span>::open(path.clone()) {
+                <span class="prelude-val">Ok</span>(file) =&gt; file, 
+                <span class="prelude-val">Err</span>(why) =&gt; {
+                    <span class="macro">eprintln!</span>(<span class="string">"[ERROR] Failed to create file at {path:?} due to: {why}"</span>);
+                    <span class="macro">panic!</span>();
+                },
+            }
+        };
+
         <span class="self">Self </span>{
             interval,
             last_update: datetime,
-            inner_file: <span class="self">Self</span>::open(<span class="self">Self</span>::gen_path(path.clone(), datetime).unwrap()).unwrap(),
+            inner_file: file,
             path,
         }
     }
@@ -113,7 +135,7 @@
 
     <span class="kw">fn </span>gen_path(<span class="kw-2">mut </span>path: PathBuf, datetime: DateTime&lt;Local&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;PathBuf, PathBuf&gt; {
         <span class="kw">let </span><span class="prelude-val">Some</span>(file_name) = path.file_name().and_then(|name| name.to_str()) <span class="kw">else </span>{
-            <span class="macro">log::error!</span>(<span class="string">"Failed to generate new file name based on: {:?}"</span>, path);
+            <span class="macro">eprintln!</span>(<span class="string">"[ERROR] Failed to generate new file name based on: {:?}"</span>, path);
             <span class="prelude-val">Err</span>(path)<span class="question-mark">?
         </span>};
 
@@ -130,15 +152,11 @@
             <span class="kw">return</span>;
         }
 
-        <span class="kw">let </span>since = now.signed_duration_since(<span class="self">self</span>.last_update);
-        <span class="kw">let </span>count = since.num_seconds() / <span class="self">self</span>.interval.num_seconds();
+        <span class="self">self</span>.last_update += <span class="self">self</span>.interval
+            * (now.signed_duration_since(<span class="self">self</span>.last_update).num_seconds()
+                / <span class="self">self</span>.interval.num_seconds()) <span class="kw">as </span>i32;
 
-        <span class="self">self</span>.last_update += <span class="self">self</span>.interval * count <span class="kw">as </span>i32;
-        <span class="comment">// while now.signed_duration_since(self.last_update) &gt;= self.interval {
-        //     self.last_update += self.interval;
-        // }
-
-        </span><span class="kw">let </span><span class="prelude-val">Ok</span>(new_path) = <span class="self">Self</span>::gen_path(<span class="self">self</span>.path.clone(), <span class="self">self</span>.last_update) <span class="kw">else </span>{
+        <span class="kw">let </span><span class="prelude-val">Ok</span>(new_path) = <span class="self">Self</span>::gen_path(<span class="self">self</span>.path.clone(), <span class="self">self</span>.last_update) <span class="kw">else </span>{
             <span class="kw">return</span>;
         };
 
