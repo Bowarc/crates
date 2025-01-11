@@ -199,7 +199,7 @@ fn _timed_file() {
     error!("error 2");
 
     sleep(Duration::from_secs_f32(1.9));
-    
+
     debug!("holaa");
     error!("error 3");
 

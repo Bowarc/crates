@@ -55,7 +55,10 @@ impl Config {
 }
 
 impl Output {
-    pub fn new_timed_file(path: impl Into<PathBuf>, interval: impl Into<std::time::Duration>) -> Self {
+    pub fn new_timed_file(
+        path: impl Into<PathBuf>,
+        interval: impl Into<std::time::Duration>,
+    ) -> Self {
         Self::TimedFile {
             path: path.into(),
             interval: Duration::from_std(interval.into()).unwrap(),

@@ -41,13 +41,13 @@ impl TimedFile {
         Ok(path)
     }
     fn update(&mut self) {
-        let now=  Local::now();
+        let now = Local::now();
 
         if now.signed_duration_since(self.last_update) < self.interval {
             return;
         }
 
-        let since  = now.signed_duration_since(self.last_update);
+        let since = now.signed_duration_since(self.last_update);
         let count = since.num_seconds() / self.interval.num_seconds();
 
         self.last_update += self.interval * count as i32;
