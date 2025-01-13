@@ -1,21 +1,54 @@
-pub fn display_bytes(bytes: u64) -> String {
-    const KB: u64 = 1024;
-    const MB: u64 = KB * 1024;
-    const GB: u64 = MB * 1024;
-    const TB: u64 = GB * 1024;
-    const PB: u64 = TB * 1024;
+pub enum Prefix {
+    Decimal,
+    Binary,
+}
 
-    if bytes < KB {
-        format!("{}B", bytes)
-    } else if bytes < MB {
-        format!("{:.2}KB", bytes as f64 / KB as f64)
-    } else if bytes < GB {
-        format!("{:.2}MB", bytes as f64 / MB as f64)
-    } else if bytes < TB {
-        format!("{:.2}GB", bytes as f64 / GB as f64)
-    } else if bytes < PB {
-        format!("{:.2}TB", bytes as f64 / TB as f64)
-    } else {
-        format!("{:.2}PB", bytes as f64 / PB as f64)
+impl Prefix{
+    const DECIMAL_UNITS: &[&str] = &["b", "Kb", "Mb", "Gb", "Tb", "Pb", "Eb", "Zb", "Yb"];
+    const BINARY_UNITS: &[&str] = &["b", "Kib", "Mib", "Gib", "Tib", "Pib", "Eib", "Zib", "Yib"];
+
+    const fn units(&self) -> &[&str]{
+        match self{
+            Self::Decimal => Self::DECIMAL_UNITS,
+            Self::Binary => Self::BINARY_UNITS,
+        }
     }
+}
+
+impl From<&Prefix> for f64 {
+    fn from(prefix: &Prefix) -> f64 {
+        match prefix {
+            Prefix::Decimal => 1000.,
+            Prefix::Binary => 1024.,
+        }
+    }
+}
+
+pub fn format(bytes: u64, prefix: &Prefix) -> String {
+    if bytes == 0 {
+        return "0 B".to_string();
+    }
+    
+    let units = prefix.units();
+    let prefix = f64::from(prefix);
+    
+    let mut size = bytes as f64;
+    let mut index = 0;
+
+    while size >= prefix && index < units.len() - 1 {
+        size /= prefix;
+        index += 1;
+    }
+
+    format!("{:.2} {}", size, units[index])
+}
+
+#[inline(always)]
+pub fn format_decimal(bytes: u64) -> String{
+    format(bytes, &Prefix::Decimal)
+}
+
+#[inline(always)]
+pub fn format_binary(bytes: u64) -> String{
+    format(bytes, &Prefix::Binary)
 }
