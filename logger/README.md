@@ -48,7 +48,7 @@ logger::init(
         // Seccond logger with a custom output, only for the errors
         logger::Config::default()
             .level(log::LevelFilter::Error)
-            .output(custom_output.clone())
+            .output(custom_output.clone()) // This clone is only so we can access it later, this is generally not needed
             .colored(true),
 
         // Third logger, that outputs to a file, Info as minimal level
