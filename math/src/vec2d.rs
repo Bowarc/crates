@@ -101,7 +101,7 @@ impl<T> Vec2D<T> {
             None
         }
     }
-    pub fn elems(&self) -> &Vec<T> {
+    pub fn elems(&self) -> &[T] {
         &self.elems
     }
     pub fn size(&self) -> crate::Point {
