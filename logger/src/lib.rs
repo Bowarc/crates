@@ -1,10 +1,14 @@
 mod config;
+mod handle;
 mod logger;
+mod message;
 mod timed_file;
 
 use std::sync::mpsc::{self, Receiver, Sender};
 
-pub use config::{Config, Output, OutputStream, ConfigError, InvalidOutputError};
+pub use config::{Config, ConfigError, InvalidOutputError, Output, OutputStream};
+use handle::LoggerThreadHandle;
+use message::Message;
 
 struct ProxyLogger {
     sender: Sender<Message>,
@@ -16,15 +20,15 @@ impl log::Log for ProxyLogger {
     }
 
     fn log(&self, record: &log::Record) {
-        self.sender
-            .send(Message::Log {
-                path: record.module_path().map(ToString::to_string),
-                file: record.file().map(ToString::to_string),
-                line: record.line(),
-                content: record.args().to_string(),
-                level: record.level(),
-            })
-            .unwrap()
+        if let Err(e) = self.sender.send(Message::Log {
+            path: record.module_path().map(ToString::to_string),
+            file: record.file().map(ToString::to_string),
+            line: record.line(),
+            content: record.args().to_string(),
+            level: record.level(),
+        }) {
+            eprintln!("[ERROR] Failed to send log record due to: {e}")
+        }
     }
 
     fn flush(&self) {
@@ -32,21 +36,26 @@ impl log::Log for ProxyLogger {
     }
 }
 
-pub fn init(cfgs: impl Into<Vec<Config>>) {
+#[must_use]
+pub fn init(cfgs: impl Into<Vec<Config>>) -> LoggerThreadHandle {
     let cfgs = cfgs.into();
 
     let (sender, receiver) = mpsc::channel::<Message>();
-    std::thread::Builder::new()
-        .name("logger".to_string())
-        .spawn(move || {
-            logger(
-                receiver,
-                cfgs.into_iter()
-                    .map(logger::Logger::from_cfg)
-                    .collect::<Vec<logger::Logger>>(),
-            );
-        })
-        .unwrap();
+
+    let handle = LoggerThreadHandle::new(
+        sender.clone(),
+        std::thread::Builder::new()
+            .name("logger".to_string())
+            .spawn(move || {
+                logger(
+                    receiver,
+                    cfgs.into_iter()
+                        .map(logger::Logger::from_cfg)
+                        .collect::<Vec<logger::Logger>>(),
+                );
+            })
+            .unwrap(),
+    );
 
     log::set_max_level(log::LevelFilter::Trace);
     log::set_boxed_logger(Box::new(ProxyLogger { sender })).unwrap();
@@ -54,18 +63,9 @@ pub fn init(cfgs: impl Into<Vec<Config>>) {
     #[cfg(feature = "panics")]
     log_panics::Config::new()
         .backtrace_mode(log_panics::BacktraceMode::Resolved)
-        .install_panic_hook()
-}
+        .install_panic_hook();
 
-enum Message {
-    Flush,
-    Log {
-        path: Option<String>,
-        file: Option<String>,
-        line: Option<u32>,
-        content: String,
-        level: log::Level,
-    },
+    handle
 }
 
 fn logger(receiver: Receiver<Message>, mut loggers: Vec<logger::Logger>) {
@@ -86,7 +86,7 @@ fn logger(receiver: Receiver<Message>, mut loggers: Vec<logger::Logger>) {
         let message = match receiver.recv() {
             Ok(message) => message,
             Err(why) => {
-                println!("[Logger failled on: {why}]");
+                eprintln!("[Logger failled on: {why}]");
                 return;
             }
         };
@@ -108,6 +108,7 @@ fn logger(receiver: Receiver<Message>, mut loggers: Vec<logger::Logger>) {
                     .for_each(|logger| logger.log(&source, line, &content, &level));
             }
             Message::Flush => loggers.iter_mut().for_each(|logger| logger.flush()),
+            Message::Exit => break,
         }
     }
 }

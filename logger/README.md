@@ -16,7 +16,8 @@ log = "0.4.20"
 Simple example
 main.rs
 ```rust
-logger::init(
+// Keep the remote thread handle
+let _logger_handle = logger::init(
     // Initiate the logger with a basic config
     logger::Config::default()
         // Set up default level, Trace is default
@@ -37,7 +38,10 @@ main.rs
 // OutputSteam is just a trait bundle of std::io::Write + Send + Sync
 let custom_output = Box::new(Writer::new()); // Writer is a simple test struct that implements std::io::Write
 
-logger::init(
+// The goal of this handle, is to make sure the remote thread is not closed until all log records are handled by the
+// log thread
+// See #27 for more informations
+let _lh = logger::init(
     // Pass an array of configs to enable multiple loggers
     [
         // Basic stdout colored logger, with Trace as default level
