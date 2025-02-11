@@ -8,6 +8,7 @@ edition = "2021"
 [features]
 default = []
 panics = ["dep:log-panics"]
+multithread = []
 
 [dependencies]
 chrono = "0.4.39"
@@ -15,4 +16,5 @@ colored = "3.0.0"
 hashbrown = "0.15.2"
 log.workspace = true
 log-panics = { version = "2.1.0", features = ["with-backtrace"], optional = true }
+parking_lot = "0.12.3"
 thiserror = "2.0.11"

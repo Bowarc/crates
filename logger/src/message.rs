@@ -2,8 +2,7 @@
 pub enum Message {
     Flush,
     Log {
-        path: Option<String>,
-        file: Option<String>,
+        source: String,
         line: Option<u32>,
         content: String,
         level: log::Level,

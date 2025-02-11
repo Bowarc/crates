@@ -6,7 +6,7 @@ use {
 };
 
 pub struct Logger {
-    output: Box<dyn super::config::OutputStream>,
+    output: parking_lot::Mutex<Box<dyn super::config::OutputStream>>,
     level: LevelFilter,
     filters: Vec<(String, LevelFilter)>,
     colored: bool,
@@ -27,7 +27,7 @@ fn color(message: &str, level: &Level) -> ColoredString {
 impl Logger {
     pub fn from_cfg(cfg: Config) -> Self {
         Self {
-            output: cfg.output.into_stream(),
+            output: parking_lot::Mutex::new(cfg.output.into_stream()),
             filters: {
                 let mut filters = cfg
                     .filters
@@ -40,17 +40,17 @@ impl Logger {
             colored: cfg.colored,
         }
     }
-    fn gen_message(
-        &self,
+    pub fn gen_message(
         source: &String,
         line: Option<u32>,
         content: &String,
         level: &Level,
+        colored: bool,
     ) -> String {
         format!(
             "[{time} {level} {path}:{line_nbr}] {message}",
             time = chrono::Local::now().format("%H:%M:%S%.3f"),
-            level = if self.colored {
+            level = if colored {
                 color(level.as_str(), level).to_string()
             } else {
                 level.to_string()
@@ -61,7 +61,7 @@ impl Logger {
                 .as_ref()
                 .map(ToString::to_string)
                 .unwrap_or("?!?".to_string()),
-            message = if self.colored {
+            message = if colored {
                 color(content, level).to_string()
             } else {
                 content.to_string()
@@ -69,7 +69,7 @@ impl Logger {
         )
     }
 
-    pub fn log(&mut self, source: &String, line: Option<u32>, content: &String, level: &Level) {
+    pub fn log(&self, source: &String, line: Option<u32>, content: &String, level: &Level) {
         let most_accurate_filter = self
             .filters
             .iter()
@@ -86,12 +86,12 @@ impl Logger {
         }
 
         writeln!(
-            self.output,
+            self.output.lock(),
             "{}",
-            self.gen_message(source, line, content, level)
+            Self::gen_message(source, line, content, level, self.colored)
         )
         .unwrap();
     }
 
-    pub fn flush(&mut self) {}
+    pub fn flush(&self) {}
 }
