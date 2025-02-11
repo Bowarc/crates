@@ -7,7 +7,7 @@ mod timed_file;
 use std::sync::mpsc::{self, Receiver, Sender};
 
 pub use config::{Config, ConfigError, InvalidOutputError, Output, OutputStream};
-use handle::LoggerThreadHandle;
+pub use handle::LoggerThreadHandle;
 use message::Message;
 
 struct ProxyLogger {
