@@ -1,14 +1,21 @@
 mod config;
+#[cfg(feature = "multithread")]
 mod handle;
 mod logger;
+#[cfg(feature = "multithread")]
 mod message;
 mod timed_file;
 
+#[cfg(feature = "multithread")]
 use std::sync::mpsc::{self, Receiver, Sender};
 
 pub use config::{Config, ConfigError, InvalidOutputError, Output, OutputStream};
+
+#[cfg(feature = "multithread")]
 pub use handle::LoggerThreadHandle;
-use message::Message;
+#[cfg(feature = "multithread")]
+pub use message::Message;
+
 
 struct ProxyLogger {
     #[cfg(feature = "multithread")]
@@ -115,7 +122,6 @@ pub fn init(cfgs: impl Into<Vec<Config>>) -> LoggerThreadHandle {
 }
 
 #[cfg(not(feature = "multithread"))]
-#[must_use]
 pub fn init(cfgs: impl Into<Vec<Config>>) {
     let cfgs = cfgs.into();
 
@@ -134,6 +140,7 @@ pub fn init(cfgs: impl Into<Vec<Config>>) {
         .install_panic_hook();
 }
 
+#[cfg(feature = "multithread")]
 fn logger(receiver: Receiver<Message>, mut loggers: Vec<logger::Logger>) {
     loop {
         let message = match receiver.recv() {
