@@ -70,17 +70,32 @@ impl Logger {
     }
 
     pub fn log(&self, source: &String, line: Option<u32>, content: &String, level: &Level) {
-        let most_accurate_filter = self
-            .filters
-            .iter()
-            .filter(|(k, _v)| source.contains(k))
-            .last()
-            .map(|(_k, v)| v)
-            .unwrap_or(&self.level);
+        // let last_filter = self
+        //     .filters
+        //     .iter()
+        //     .filter(|(k, _v)| source.contains(k))
+        //     .last()
+        //     .map(|(_k, v)| v)
+        //     .unwrap_or(&self.level);
 
+        let most_accurate_filter = 'a:  {
+            let mut possible_filters = self
+                .filters
+                .iter()
+                .flat_map(|(f, level)| Some((level, source.find(f)?)))
+                .collect::<Vec<_>>();
+
+            if possible_filters.is_empty() {
+                break 'a self.level;
+            }
+
+            possible_filters.sort_unstable_by_key(|(_s, index)| *index);
+
+            *possible_filters.first().unwrap().0
+        };
         // println!("{most_accurate_filter:?}");
 
-        if most_accurate_filter < level {
+        if &most_accurate_filter < level {
             // println!("Skipped '{content}' from {source}, because the level '{level}' was too low");
             return;
         }
