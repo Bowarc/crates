@@ -78,21 +78,9 @@ impl Logger {
         //     .map(|(_k, v)| v)
         //     .unwrap_or(&self.level);
 
-        let most_accurate_filter = 'a:  {
-            let mut possible_filters = self
-                .filters
-                .iter()
-                .flat_map(|(f, level)| Some((level, source.find(f)?)))
-                .collect::<Vec<_>>();
+        let most_accurate_filter =
+            get_most_accurate_filter(source, &self.filters).unwrap_or(self.level);
 
-            if possible_filters.is_empty() {
-                break 'a self.level;
-            }
-
-            possible_filters.sort_unstable_by_key(|(_s, index)| *index);
-
-            *possible_filters.first().unwrap().0
-        };
         // println!("{most_accurate_filter:?}");
 
         if &most_accurate_filter < level {
@@ -109,4 +97,91 @@ impl Logger {
     }
 
     pub fn flush(&self) {}
+}
+
+fn get_most_accurate_filter(
+    source: &str,
+    filters: &[(String, LevelFilter)],
+) -> Option<log::LevelFilter> {
+    // The goal here, is to get the distance from the last position of the match to the end of the searched string
+    let get_index =
+        |s1: &str, s2: &str| -> Option<usize> { s1.find(s2).map(|i| s1.len() - s2.len() + i) };
+
+    let mut possible_filters = filters
+        .iter()
+        .flat_map(|(filter, level)| Some((level, get_index(source, filter)?)))
+        .collect::<Vec<_>>();
+
+    if possible_filters.is_empty() {
+        return None;
+    }
+
+    // Get the filter with the lowest number
+    possible_filters.sort_by_cached_key(|(_s, index)| *index);
+
+    // println!("{possible_filters:?}");
+    Some(*possible_filters.first().unwrap().0)
+}
+
+// This one works too, but i think it's slower
+// fn get_most_accurate_filter(
+//     source: &str,
+//     filters: &[(String, LevelFilter)],
+// ) -> Option<log::LevelFilter> {
+//     let mut possible_filters = filters
+//         .iter()
+//         .filter(|(filter, _)| source.contains(filter))
+//         .collect::<Vec<_>>();
+//
+//     possible_filters.sort_by(|&(a, _), &(b, _)| {
+//         let a_index = source.find(a).unwrap();
+//         let b_index = source.find(b).unwrap();
+//
+//         let index_cmp = a_index.cmp(&b_index);
+//         if index_cmp != std::cmp::Ordering::Equal {
+//             return index_cmp;
+//         }
+//
+//         b.len().cmp(&a.len()) // Reverse order for longer strings
+//     });
+//
+//     println!("{possible_filters:?}");
+//
+//     possible_filters.first().map(|(_, level)| level).cloned()
+// }
+
+#[test]
+fn test() {
+    use log::LevelFilter;
+    let filters = vec![
+        ("Test".to_string(), LevelFilter::Off),
+        ("Test::a".to_string(), LevelFilter::Trace),
+        ("Te".to_string(), LevelFilter::Debug),
+        ("lib::long_module_name".to_string(), LevelFilter::Info),
+        ("lib".to_string(), LevelFilter::Warn),
+    ];
+    assert_eq!(
+        get_most_accurate_filter("Test::", &filters),
+        Some(LevelFilter::Off)
+    );
+    assert_eq!(
+        get_most_accurate_filter("Test::a", &filters),
+        Some(LevelFilter::Trace)
+    );
+    assert_eq!(
+        get_most_accurate_filter("Teta::", &filters),
+        Some(LevelFilter::Debug)
+    );
+    assert_eq!(
+        get_most_accurate_filter("mylib", &filters),
+        Some(LevelFilter::Warn)
+    );
+    assert_eq!(
+        get_most_accurate_filter("lib", &filters),
+        Some(LevelFilter::Warn)
+    );
+    assert_eq!(
+        get_most_accurate_filter("lib::", &filters),
+        Some(LevelFilter::Warn)
+    );
 }
