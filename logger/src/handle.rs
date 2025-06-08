@@ -1,3 +1,4 @@
+#[cfg_attr(feature = "bevy", derive(bevy::ecs::prelude::Resource))]
 pub struct LoggerThreadHandle {
     sender: std::sync::mpsc::Sender<crate::Message>,
     inner: Option<std::thread::JoinHandle<()>>,
