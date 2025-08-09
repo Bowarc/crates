@@ -37,7 +37,7 @@ fn all() {
 
     // Formatting
     let d = std::time::Duration::from_secs(3600);
-    println!("{}", time::format(d, -1)); // 1h
+    println!("{}", time::format(&d, -1)); // 1h
 
     // Time a function
     let fn1 = |x: i32| -> bool {
@@ -52,7 +52,7 @@ fn all() {
 
     println!(
         "fn1 ran for {} and returnred {}",
-        time::format(dur, 1),
+        time::format(&dur, 1),
         fn_out
     );
     // fn1 ran for 200ns and returnred true
@@ -66,7 +66,7 @@ fn all() {
 
     println!(
         "fn2 ran for {} and returnred {}",
-        time::format(dur, 2),
+        time::format(&dur, 2),
         fn_out
     );
     // fn2 ran for 1s 200ms and returnred 15
@@ -83,7 +83,7 @@ fn all() {
 
     println!(
         "fn3 ran for {} and returnred {:?}",
-        time::format(dur, 1),
+        time::format(&dur, 1),
         fn_out
     );
     // fn3 ran for 500ms and returnred ()

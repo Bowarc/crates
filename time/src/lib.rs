@@ -130,13 +130,13 @@ impl From<f64> for DTDelay {
 ///
 /// std::thread::sleep(std::time::Duration::from_secs_f32(1.5));
 ///
-/// println!("{}", time::format(stopwatch.read(), 1)); // 1.5s
+/// println!("{}", time::format(&stopwatch.read(), 1)); // 1.5s
 ///
 /// stopwatch.stop();
 ///
 /// std::thread::sleep(std::time::Duration::from_secs(1));
 ///
-/// println!("{}", time::format(stopwatch.read(), 1)); // 1.5s
+/// println!("{}", time::format(&stopwatch.read(), 1)); // 1.5s
 /// ```
 
 #[derive(Debug, Clone)]
@@ -196,7 +196,7 @@ impl Stopwatch {
 
 impl std::fmt::Display for Stopwatch {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", format(self.read(), -1))
+        write!(f, "{}", format(&self.read(), -1))
     }
 }
 
@@ -219,17 +219,17 @@ impl std::fmt::Display for Stopwatch {
 /// let duration = std::time::Duration::new(80000, 0); // 80,000 seconds
 ///
 /// // Displaying only the largest unit (precision = 1)
-/// assert_eq!(time::format(duration, 1), "22h");
+/// assert_eq!(time::format(&duration, 1), "22h");
 ///
 /// // Displaying the two largest units (precision = 2)
-/// assert_eq!(time::format(duration, 2), "22h 13m");
+/// assert_eq!(time::format(&duration, 2), "22h 13m");
 ///
 /// // Displaying all non-zero units (precision = -1)
-/// assert_eq!(time::format(duration, -1), "22h 13m 20s");
+/// assert_eq!(time::format(&duration, -1), "22h 13m 20s");
 ///
 /// // Duration of 0 seconds
 /// let duration_zero = std::time::Duration::new(0, 0);
-/// assert_eq!(time::format(duration_zero, -1), "0ns");
+/// assert_eq!(time::format(&duration_zero, -1), "0ns");
 /// ```
 ///
 /// # Notes
@@ -252,7 +252,7 @@ impl std::fmt::Display for Stopwatch {
 /// # Panics
 ///
 /// This function does not panic.
-pub fn format(duration: std::time::Duration, mut prec: i8) -> String {
+pub fn format(duration: &std::time::Duration, mut prec: i8) -> String {
     const NANOS_IN_MICROSECOND: f64 = 1_000.0;
     const NANOS_IN_MILLISECOND: f64 = 1_000_000.0;
     const NANOS_IN_SECOND: f64 = 1_000_000_000.0;

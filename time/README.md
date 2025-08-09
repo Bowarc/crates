@@ -53,7 +53,7 @@ assert_eq!(one, two);
 
 // Formatting
 let d = std::time::Duration::from_secs(3600);
-println!("{}", time::format(d, -1)); // 1h
+println!("{}", time::format(&d, -1)); // 1h
 
 // Time a function
 let fn1 = |x: i32| -> bool {
@@ -66,7 +66,7 @@ let fn1 = |x: i32| -> bool {
 
 let (fn_out, dur): (bool, std::time::Duration) = time::timeit(|| fn1(15));
 
-println!("fn1 ran for {} and returnred {}", time::format(dur, 1), fn_out);
+println!("fn1 ran for {} and returnred {}", time::format(&dur, 1), fn_out);
 // fn1 ran for 200ns and returnred true
 
 let fn2 = || -> i32{
@@ -76,7 +76,7 @@ let fn2 = || -> i32{
 
 let (fn_out, dur): (i32, std::time::Duration) = time::timeit(fn2);
 
-println!("fn2 ran for {} and returnred {}", time::format(dur, 2), fn_out);
+println!("fn2 ran for {} and returnred {}", time::format(&dur, 2), fn_out);
 // fn2 ran for 1s 200ms and returnred 15
 
 // Mutable args
@@ -89,7 +89,7 @@ let fn3 = |x: &mut i32| {
 
 let (fn_out, dur): ((), std::time::Duration) = time::timeit_mut(|| fn3(&mut x));
 
-println!("fn3 ran for {} and returnred {:?}", time::format(dur, 1), fn_out);
+println!("fn3 ran for {} and returnred {:?}", time::format(&dur, 1), fn_out);
 // fn3 ran for 500ms and returnred ()
 
 
@@ -101,5 +101,5 @@ async fn fn4() -> String {
     "Hi".to_string()
 }
 let (fn_out, dur) = timeit_async(|| fn4()).await;
-println!("fn4 ran for {} and returnred {:?}", time::format(dur), fn_out);
+println!("fn4 ran for {} and returnred {:?}", time::format(&dur), fn_out);
 ```
