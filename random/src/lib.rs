@@ -1,10 +1,15 @@
+#![cfg_attr(docsrs, feature(doc_cfg))]
+
 #[macro_use]
 extern crate log;
 
+
 #[cfg(feature = "bag")]
+#[cfg_attr(docsrs, doc(cfg(feature = "bag")))]
 pub mod weighted_bag;
 
 #[cfg(feature = "bag")]
+#[cfg_attr(docsrs, doc(cfg(feature = "bag")))]
 pub use weighted_bag::WeightedBag;
 
 struct Storage {
