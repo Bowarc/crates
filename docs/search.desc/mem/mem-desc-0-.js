@@ -1,1 +1,1 @@
-searchState.loadedDescShard("mem", 0, "")
+searchState.loadedDescShard("mem", 0, "Returns the argument unchanged.\nCalls <code>U::from(self)</code>.")

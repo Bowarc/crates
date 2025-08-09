@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["display_bytes"]};
+window.SIDEBAR_ITEMS = {"enum":["Prefix"],"fn":["format","format_binary","format_decimal"]};

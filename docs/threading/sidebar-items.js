@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["pool"],"struct":["Channel"]};
+window.SIDEBAR_ITEMS = {"struct":["Channel"]};
