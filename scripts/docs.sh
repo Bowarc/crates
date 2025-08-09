@@ -5,7 +5,8 @@ cargo clean --doc
 rm -rf ./docs
 
 echo Building updated docs
-cargo doc --no-deps
+# cargo doc --no-deps
+RUSTDOCFLAGS="--cfg docsrs" cargo +nightly doc --all-features --no-deps
 
 echo Creating ./docs
 mkdir ./docs
