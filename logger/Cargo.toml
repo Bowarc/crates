@@ -19,6 +19,6 @@ log.workspace = true
 log-panics = { version = "2.1.0", features = [
   "with-backtrace",
 ], optional = true }
-bevy = { version = "0.16.1", optional = true }
+bevy = { version = "0.17.2", optional = true }
 parking_lot = "0.12.3"
 thiserror = "2.0.11"
