@@ -17,7 +17,7 @@ serde = ["dep:serde"]
 bag = ["dep:num-traits"]
 
 [dependencies]
-rand = { version = "0.8.5", features = ["small_rng"] }
+rand = { version = "0.9.2", features = ["small_rng", "alloc", "os_rng"], default-features = false }
 log.workspace = true
 serde = { workspace = true, features = ["derive"], optional = true }
 num-traits = { version = "0.2.19", optional = true }

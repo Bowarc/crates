@@ -28,7 +28,7 @@ fn deterministic() {
     const SEED: u64 = 8090289391169979980;
 
     fn assert_int_sequence<
-        T: Clone + std::fmt::Debug + PartialOrd + rand::distributions::uniform::SampleUniform,
+        T: Clone + std::fmt::Debug + PartialOrd + rand::distr::uniform::SampleUniform,
     >(
         seq: &[T],
         min: T,
@@ -54,53 +54,56 @@ fn deterministic() {
     #[rustfmt::skip]
     assert_int_sequence(
         &[
-            1473658190,
-            1355345873, 
-            131327370, 
-            1937881571, 
-            31378253,
-            517943301,
-            7043390,
-            233275587,
-            1545832033,
+            2048557442, // 1473658190,
+            1762536587, // 1355345873, 
+            944008383, // 131327370, 
+            1160680275, // 1937881571, 
+            1426541036, // 31378253,
+            137237743, // 517943301,
+            889800351, // 7043390,
+            1847050577, // 233275587,
+            2108763530, // 1545832033,
         ],
         0,
         i32::MAX,
     );
 
-    assert_eq!(4, random::get::<i32>(0, 10));
-    assert_eq!(1862, random::get::<i32>(42, 10000));
-    assert_eq!(0, random::get_inc::<i32>(0, 10));
-    assert_eq!(188, random::get_inc::<i32>(42, 10000));
-    assert_eq!(2046971347, random::get_inc::<i32>(0, i32::MAX));
+    assert_eq!(5, random::get::<i32>(0, 10));
+    assert_eq!(3274, random::get::<i32>(42, 10000));
+    assert_eq!(10, random::get_inc::<i32>(0, 10));
+    assert_eq!(3830, random::get_inc::<i32>(42, 10000));
+    assert_eq!(326153804, random::get_inc::<i32>(0, i32::MAX));
 
-    assert_eq!(7, random::get::<u128>(0, 10));
-    assert_eq!(8716, random::get::<u128>(42, 10000));
-    assert_eq!(5, random::get_inc::<u128>(0, 10));
-    assert_eq!(3, random::get_inc::<u128>(0, 10));
-    assert_eq!(1, random::get::<u128>(0, 10));
-    assert_eq!(2323, random::get_inc::<u128>(42, 10000));
+    assert_eq!(5, random::get::<u128>(0, 10));
+    assert_eq!(2059, random::get::<u128>(42, 10000));
+    assert_eq!(7, random::get_inc::<u128>(0, 10));
+    assert_eq!(6974, random::get_inc::<u128>(42, 10000));
+    assert_eq!(8, random::get_inc::<u128>(0, 10));
     assert_eq!(
-        240865189765160804535080564014790761235,
+        277383218987136418957275026246268235247,
         random::get_inc::<u128>(42, u128::MAX)
     );
 
     assert_eq!(
-        "ek1VFAPH4iHlfYG9SyPL2H3eleUK0JGyGz89PZLkFGT39shBCkWyMK83QCM6vAWgGkp6cGTzznbm8B3WIajfWCugTm502wUDSwzA", 
+        "DoIMW8hX9OWEYxQEBJj9cXBHK9Gd0sl0pZQJFIzcwJrwmU1vagFASixQaJYW6toAjtnIrMeZgmLV2fHmiEACDCnN3qr6eLLM9u1v",
         random::str(100)
     );
 
     #[rustfmt::skip]
     assert_bool_sequence(&[
+        true, true,
+        false, false,
+        true, true,
+        true, true,
         true, false,
-        false, true,
-        true, true, 
-        false, true,
+        true, true,
         false, true,
         false, true,
         true, false,
-        true, true, 
-        true, true, 
-        false, true
+        true, true,
+        false, true,
+        false, false,
+        true, false,
+        true, false,
     ]);
 }

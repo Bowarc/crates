@@ -7,7 +7,7 @@
 /// - [u64]
 /// - [u128]
 pub trait Weight:
-    rand::distributions::uniform::SampleUniform
+    rand::distr::uniform::SampleUniform
     + num_traits::Unsigned
     + num_traits::Zero
     + num_traits::One
@@ -19,7 +19,7 @@ pub trait Weight:
 }
 
 impl<
-        T: rand::distributions::uniform::SampleUniform
+        T: rand::distr::uniform::SampleUniform
             + num_traits::Unsigned
             + num_traits::Zero
             + num_traits::One

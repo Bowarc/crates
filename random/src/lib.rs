@@ -3,7 +3,6 @@
 #[macro_use]
 extern crate log;
 
-
 #[cfg(feature = "bag")]
 #[cfg_attr(docsrs, doc(cfg(feature = "bag")))]
 pub mod weighted_bag;
@@ -19,22 +18,21 @@ struct Storage {
 
 std::thread_local! {
     static STORAGE: std::cell::RefCell<Storage> = std::cell::RefCell::new({
-    use {
-        rand::{rngs::SmallRng, Rng, SeedableRng as _},
-    };
+        use {
+            rand::{rngs::SmallRng, Rng, SeedableRng as _},
+        };
 
-    // This is ugly, but i need the seed
-    let seed = SmallRng::from_entropy().gen::<u64>();
-
-    trace!("Initializing with seed: {seed}");
-
-    Storage {
-        seed,
-        // This is the fastest way to make multithreading i found
-        rng: SmallRng::seed_from_u64(seed),
-    }
+        // This is ugly, but i need the seed
+        let seed = SmallRng::try_from_os_rng().unwrap().random::<u64>();
 
 
+        trace!("Initializing with seed: {seed}");
+
+        Storage {
+            seed,
+            // This is the fastest way to make multithreading I found
+            rng: SmallRng::seed_from_u64(seed),
+        }
     })
 }
 
@@ -59,7 +57,7 @@ pub fn seed() -> u64 {
 /// x has to be smaller than or equal to y
 pub fn get<T>(x: T, y: T) -> T
 where
-    T: rand::distributions::uniform::SampleUniform
+    T: rand::distr::uniform::SampleUniform
         + std::cmp::PartialEq
         + std::cmp::PartialOrd
         + std::fmt::Debug,
@@ -71,7 +69,7 @@ where
         return x;
     };
 
-    STORAGE.with_borrow_mut(|storage| storage.rng.gen_range(x..y))
+    STORAGE.with_borrow_mut(|storage| storage.rng.random_range(x..y))
 }
 
 /// Samples a number from the range x..=y
@@ -80,7 +78,7 @@ where
 pub fn get_inc<T>(x: T, y: T) -> T
 where
     // R: rand::distributions::uniform::SampleRange<T> + std::fmt::Debug,
-    T: rand::distributions::uniform::SampleUniform
+    T: rand::distr::uniform::SampleUniform
         + std::cmp::PartialEq
         + std::fmt::Debug
         + std::cmp::PartialOrd,
@@ -92,7 +90,7 @@ where
         return x;
     };
 
-    STORAGE.with_borrow_mut(|storage| storage.rng.gen_range(x..=y))
+    STORAGE.with_borrow_mut(|storage| storage.rng.random_range(x..=y))
 }
 
 /// Returns true 50% of the time
@@ -101,12 +99,12 @@ where
 pub fn conflip() -> bool {
     use rand::Rng as _;
 
-    STORAGE.with_borrow_mut(|storage| storage.rng.gen_bool(0.5))
+    STORAGE.with_borrow_mut(|storage| storage.rng.random_bool(0.5))
 }
 
 /// Samples a random String with a given lengh
 pub fn str(len: usize) -> String {
-    use rand::distributions::{Alphanumeric, DistString};
+    use rand::distr::{Alphanumeric, SampleString};
 
     STORAGE.with_borrow_mut(|storage| Alphanumeric.sample_string(&mut storage.rng, len))
 }
@@ -115,7 +113,7 @@ pub fn str(len: usize) -> String {
 ///
 /// Panics if the input slice is empty
 pub fn pick<T: std::fmt::Debug>(input: &[T]) -> &T {
-    use rand::seq::SliceRandom;
+    use rand::seq::IndexedRandom;
 
     if input.is_empty() {
         panic!("Can't sample empty slice ")
