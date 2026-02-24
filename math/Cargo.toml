@@ -13,7 +13,6 @@ geo = ["dep:geo"]
 
 [dependencies]
 log.workspace = true
-ggez = { git = "https://github.com/ggez/ggez", branch = "devel", optional = true}
+ggez = { version = " 0.9.3", optional = true }
 serde = { workspace = true, features = ["derive"], optional = true }
 geo = { version = "0.30.0", optional = true }
-
